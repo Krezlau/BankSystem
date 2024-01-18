@@ -25,6 +25,9 @@ public class User : Auditable
     [RegularExpression("^[a-zA-ZĘęÓóĄąŚśŁłŻżŹźĆćŃń ,.'-]+$")]
     public string LastName { get; set; } = string.Empty;
     
+    [Required]
+    public decimal AccountBalance { get; set; }
+    
     public virtual UserSensitiveData SensitiveData { get; set; } = new();
     
     public virtual List<Transfer> TransfersSent { get; set; } = new();
