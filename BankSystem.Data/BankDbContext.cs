@@ -8,16 +8,14 @@ public class BankDbContext : DbContext
     public BankDbContext(DbContextOptions<BankDbContext> options) : base(options)
     {
     }
-    
-    public DbSet<User> Users { get; set; }
-    public DbSet<Transfer> Transfers { get; set; }
-    public DbSet<UserSensitiveData> UserSensitiveData { get; set; }
-    public DbSet<Logins> Logins { get; set; }
+
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Transfer> Transfers { get; set; } = null!;
+    public DbSet<UserSensitiveData> UserSensitiveData { get; set; } = null!;
+    public DbSet<Login> Logins { get; set; } = null!;
+    public DbSet<DebitCard> DebitCards { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
     }
 }

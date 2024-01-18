@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem.Data.Entities;
 
-public class UserSensitiveData : Auditable
+public class DebitCard
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -16,12 +16,14 @@ public class UserSensitiveData : Auditable
     public virtual User? User { get; set; }
     
     [Required]
-    [RegularExpression(@"^[A-Z]{3}\s\d{6}$")]
-    [MaxLength(10)]
-    public string IdNumber { get; set; } = string.Empty;
+    [MaxLength(16)]
+    public string CardNumber { get; set; } = string.Empty;
     
     [Required]
-    [Phone]
-    [MaxLength(15)]
-    public string PhoneNumber { get; set; } = string.Empty;
+    [MaxLength(3)]
+    public string Cvv { get; set; } = string.Empty;
+    
+    [Required]
+    [MaxLength(6)]
+    public string ExpirationDate { get; set; } = string.Empty;
 }
