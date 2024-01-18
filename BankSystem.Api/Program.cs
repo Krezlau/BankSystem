@@ -1,3 +1,4 @@
+using BankSystem.Api.Middleware;
 using BankSystem.Data;
 using BankSystem.Repositories;
 using BankSystem.Services;
@@ -31,5 +32,6 @@ app.UseCors(options =>
 });
 
 app.MapControllers();
+app.UseMiddleware<SignInAttemptLoggerMiddleware>();
 
 app.Run();
