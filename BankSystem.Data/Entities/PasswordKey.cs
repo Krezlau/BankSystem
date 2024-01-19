@@ -14,7 +14,7 @@ public class PasswordKey
     public byte[] Salt { get; set; } = new byte[16];
     
     [Required]
-    public byte[] Key { get; set; } = new byte[32];
+    public byte[] EncryptedShare { get; set; } = new byte[32];
     
     [Required]
     public byte[] IV { get; set; } = new byte[16];
@@ -27,6 +27,6 @@ public class PasswordKey
 
     public override string ToString()
     {
-        return Encoding.UTF8.GetString(Key);
+        return Encoding.UTF8.GetString(EncryptedShare);
     }
 }
