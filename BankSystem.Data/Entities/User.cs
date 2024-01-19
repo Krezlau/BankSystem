@@ -15,7 +15,9 @@ public class User : Auditable
     public string Email { get; set; } = string.Empty;
     
     [Required]
-    public string PasswordHash { get; set; } = string.Empty;
+    public string SecretHash { get; set; } = string.Empty;
+    
+    public virtual List<PasswordKey> PasswordKeys { get; set; } = new();
     
     [Required]
     [RegularExpression("^[a-zA-ZĘęÓóĄąŚśŁłŻżŹźĆćŃń ,.'-]+$")]
