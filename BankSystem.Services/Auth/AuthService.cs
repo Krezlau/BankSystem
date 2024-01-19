@@ -1,12 +1,14 @@
-﻿using BankSystem.Data.Entities;
+﻿using System.Text;
+using BankSystem.Data.Entities;
 using BankSystem.Data.Models;
+using BankSystem.Repositories.Auth;
 using BankSystem.Repositories.Users;
 
 namespace BankSystem.Services.Auth;
 
 public interface IAuthService
 {
-    Task<bool> LoginCheckAsync(LoginCheckRequestModel model);
+    Task<LoginCheckResponseModel> LoginCheckAsync(LoginCheckRequestModel model);
     
     Task<bool> LoginAsync(LoginRequestModel model);
     
@@ -17,15 +19,21 @@ public interface IAuthService
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly ILoginRequestRepository _loginRequestRepository;
 
-    public AuthService(IUserRepository userRepository)
+    public AuthService(IUserRepository userRepository, ILoginRequestRepository loginRequestRepository)
     {
         _userRepository = userRepository;
+        _loginRequestRepository = loginRequestRepository;
     }
 
-    public async Task<bool> LoginCheckAsync(LoginCheckRequestModel model)
+    public async Task<LoginCheckResponseModel> LoginCheckAsync(LoginCheckRequestModel model)
     {
-        throw new NotImplementedException();
+        var mask = GenerateMask();
+        
+        var loginRequest = await _loginRequestRepository.CreateLoginRequestAsync(mask, model.Email);
+        
+        return new LoginCheckResponseModel(mask, loginRequest.Id);
     }
 
     public async Task<bool> LoginAsync(LoginRequestModel model)
@@ -48,4 +56,26 @@ public class AuthService : IAuthService
         };
         return await _userRepository.CreateUserAsync(user, partialPassword.keys);
     }
+    
+    # region private methods
+
+    private static string GenerateMask()
+    {
+        var random = new Random();
+        HashSet<int> positions = new();
+        while (positions.Count < 5)
+        {
+            positions.Add(random.Next(0, 24));
+        }
+        
+        
+        var mask = new StringBuilder();
+        for (var i = 0; i < 24; i++)
+        {
+            mask.Append(positions.Contains(i) ? '1' : '0');
+        }
+        return mask.ToString();
+    }
+    
+    # endregion
 }

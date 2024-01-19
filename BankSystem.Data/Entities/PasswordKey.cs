@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BankSystem.Data.Entities;
 
-public class PasswordKey
+public class PasswordKey : Auditable
 {
     [Key]
     public Guid Id { get; set; }
@@ -24,9 +24,4 @@ public class PasswordKey
 
     [ForeignKey(nameof(UserId))] 
     public virtual User User { get; set; } = new User();
-
-    public override string ToString()
-    {
-        return Encoding.UTF8.GetString(EncryptedShare);
-    }
 }

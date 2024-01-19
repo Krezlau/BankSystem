@@ -15,18 +15,24 @@ public class AuthController : ControllerBase
     {
         _authService = authService;
     }
+    
+    [HttpPost("login-check")]
+    public async Task<IActionResult> LoginCheck([FromBody] LoginCheckRequestModel model)
+    {
+        return Ok(ApiResponseHelper.Success(await _authService.LoginCheckAsync(model)));
+    }
 
     [HttpPost]
     [LogSignInAttempts]
     public async Task<IActionResult> Login([FromBody] LoginRequestModel model)
     {
-        return Ok(await _authService.LoginAsync(model));
+        return Ok(ApiResponseHelper.Success(await _authService.LoginAsync(model)));
     }
     
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestModel model)
     {
-        return Ok(await _authService.RegisterAsync(model));
+        return Ok(ApiResponseHelper.Success(await _authService.RegisterAsync(model)));
     }
     
 }
