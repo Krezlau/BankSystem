@@ -10,8 +10,8 @@ public class LoginRequestModel
     public string Email { get; set; } = string.Empty;
     
     [Required]
-    public List<int> PasswordPositions { get; set; } = new List<int>();
+    public Guid Key { get; set; }
     
     [Required]
-    public List<char> PasswordCharacters { get; set; } = new List<char>();
+    public string PasswordCharacters { get; set; } = string.Empty;
 }

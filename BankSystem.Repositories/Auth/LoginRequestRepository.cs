@@ -5,7 +5,11 @@ namespace BankSystem.Repositories.Auth;
 
 public interface ILoginRequestRepository
 {
+    Task<LoginRequest?> GetLoginRequestAsync(Guid id);
+    
     Task<LoginRequest> CreateLoginRequestAsync(string mask, string email);
+
+    Task ConsumeLoginRequestAsync(LoginRequest loginRequest);
 }
 
 public class LoginRequestRepository : ILoginRequestRepository
@@ -15,6 +19,11 @@ public class LoginRequestRepository : ILoginRequestRepository
     public LoginRequestRepository(BankDbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public async Task<LoginRequest?> GetLoginRequestAsync(Guid id)
+    {
+        return await _dbContext.LoginRequests.FindAsync(id);
     }
 
     public async Task<LoginRequest> CreateLoginRequestAsync(string mask, string email)
@@ -29,5 +38,12 @@ public class LoginRequestRepository : ILoginRequestRepository
         await _dbContext.LoginRequests.AddAsync(loginRequest);
         await _dbContext.SaveChangesAsync();
         return loginRequest;
+    }
+
+    public async Task ConsumeLoginRequestAsync(LoginRequest loginRequest)
+    {
+        loginRequest.Consumed = true;
+        _dbContext.LoginRequests.Update(loginRequest);
+        await _dbContext.SaveChangesAsync();
     }
 }

@@ -121,8 +121,7 @@ public static class PasswordService
     private static string MakeShare(int pos, byte[] y)
     {
         StringBuilder sb = new();
-        if (pos < 10) sb.Append('0');
-        sb.Append(pos);
+        sb.Append(pos.ToString("X2"));
         sb.Append('-');
         sb.Append(ConvertYToHex(y));
         
