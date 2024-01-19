@@ -14,6 +14,7 @@ public class BankDbContext : DbContext
     public DbSet<UserSensitiveData> UserSensitiveData { get; set; } = null!;
     public DbSet<Login> Logins { get; set; } = null!;
     public DbSet<DebitCard> DebitCards { get; set; } = null!;
+    public DbSet<PasswordKey> PasswordKeys { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

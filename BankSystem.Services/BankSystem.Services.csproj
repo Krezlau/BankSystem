@@ -14,6 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BankSystem.Data\BankSystem.Data.csproj" />
+      <ProjectReference Include="..\BankSystem.Repositories\BankSystem.Repositories.csproj" />
     </ItemGroup>
 
 </Project>

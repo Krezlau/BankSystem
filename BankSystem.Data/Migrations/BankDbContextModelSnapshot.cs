@@ -117,6 +117,34 @@ namespace BankSystem.Data.Migrations
                     b.ToTable("Logins");
                 });
 
+            modelBuilder.Entity("BankSystem.Data.Entities.PasswordKey", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("IV")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("Key")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("Salt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordKeys");
+                });
+
             modelBuilder.Entity("BankSystem.Data.Entities.Transfer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -188,7 +216,7 @@ namespace BankSystem.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("SecretHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -258,6 +286,17 @@ namespace BankSystem.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BankSystem.Data.Entities.PasswordKey", b =>
+                {
+                    b.HasOne("BankSystem.Data.Entities.User", "User")
+                        .WithMany("PasswordKeys")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BankSystem.Data.Entities.Transfer", b =>
                 {
                     b.HasOne("BankSystem.Data.Entities.User", "Receiver")
@@ -294,6 +333,8 @@ namespace BankSystem.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Logins");
+
+                    b.Navigation("PasswordKeys");
 
                     b.Navigation("SensitiveData")
                         .IsRequired();

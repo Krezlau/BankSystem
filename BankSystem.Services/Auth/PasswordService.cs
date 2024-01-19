@@ -8,16 +8,9 @@ using SecretSharingDotNet.Math;
 
 namespace BankSystem.Services.Auth;
 
-public interface IPasswordService
+public static class PasswordService 
 {
-    (string hashedSecret, List<PasswordKey> keys) CreatePassword(string plaintextPassword);
-
-    bool VerifyPassword(List<(int pos, char c)> passwordChars, string hashedSecret, List<PasswordKey> keys);
-}
-
-public class PasswordService : IPasswordService
-{
-    public (string hashedSecret, List<PasswordKey> keys) CreatePassword(string plaintextPassword)
+    public static (string hashedSecret, List<PasswordKey> keys) CreatePassword(string plaintextPassword)
     {
         var keys = new List<(byte[] iv, byte[] key, byte[] salt)>();
         // kdf on every character
@@ -34,11 +27,11 @@ public class PasswordService : IPasswordService
         // var (secret, shares) = Shamir.MakeRandomShares(5, plaintextPassword.Length);
         var gcd = new ExtendedEuclideanAlgorithm<BigInteger>();
         var split = new ShamirsSecretSharing<BigInteger>(gcd);
-        var shares = split.MakeShares(5, plaintextPassword.Length, 43112609);
+        var shares = split.MakeShares(5, plaintextPassword.Length,  10000);
         if (shares.OriginalSecret is null) throw new Exception("Original secret is null");
         var secret = shares.OriginalSecret.Value;
         
-        var encrypted = new List<byte[]>();
+        var encrypted = new List<string>();
         // encrypt shares with keys using cbc
         for (int i = 0; i < shares.Count; i++)
         {
@@ -46,17 +39,16 @@ public class PasswordService : IPasswordService
             aes.Key = keys[i].key;
             aes.IV = keys[i].iv;
             aes.Mode = CipherMode.CBC;
+            aes.BlockSize = 128;
             
-            var encryptor = aes.CreateEncryptor();
-            using var memoryStream = new MemoryStream();
-            using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
-            using var writer = new StreamWriter(cryptoStream);
-            writer.Write(shares[i].Y.ToString());
-            encrypted.Add(memoryStream.ToArray());
+            var ct = aes.EncryptCbc(shares[i].Y.Value.ToByteArray(), keys[i].iv);
+            var bytes = shares[i].Y.Value.ToByteArray();
+            var str = Convert.ToBase64String(bytes);
+            encrypted.Add(Convert.ToBase64String(ct));
         }
         
         // hash secret
-        var hashedSecret = Convert.ToBase64String(HashPassword(secret.ToBase64()));
+        var hashedSecret = Convert.ToBase64String(HashPassword(secret));
         
         var passwordKeys = new List<PasswordKey>();
         for (int i = 0; i < shares.Count; i++)
@@ -64,7 +56,7 @@ public class PasswordService : IPasswordService
             passwordKeys.Add(new PasswordKey()
             {
                 IV = keys[i].iv,
-                Key = encrypted[i],
+                Key = Convert.FromBase64String(encrypted[i]),
                 Salt = keys[i].salt,
             });
         }
@@ -72,47 +64,44 @@ public class PasswordService : IPasswordService
         return (hashedSecret, passwordKeys);
     }
 
-    public bool VerifyPassword(List<(int pos, char c)> passwordChars, string hashedSecret, List<PasswordKey> keys)
+    public static bool VerifyPassword(List<(int pos, char c)> passwordChars, string hashedSecret, List<PasswordKey> keys)
     {
         var shares = new List<string>();
         foreach ((int pos, char c) in passwordChars)
         {
-            var key = Rfc2898DeriveBytes.Pbkdf2(c.ToString(), keys[pos].Salt, 100_000, HashAlgorithmName.SHA256, 32);
+            var key = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(c.ToString()), keys[pos].Salt, 100_000, HashAlgorithmName.SHA256, 32);
             using var aes = Aes.Create();
-            aes.Key = keys[pos].Key;
             aes.IV = keys[pos].IV;
             aes.Mode = CipherMode.CBC;
+            aes.BlockSize = 128;
 
-            var encryptor = aes.CreateDecryptor();
-            using var memoryStream = new MemoryStream();
-            using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
-            using var writer = new StreamWriter(cryptoStream);
-            // copy
-            var input = keys[pos].Key.ToList();
-            // from python (0).to_bytes(16, 'little')
-            input.AddRange(new byte[] {0, 0, 0, 0, 0, 0, 0, 0});
-            
-            writer.Write(input);
-            var y = memoryStream.ToArray();
-            shares.Add(MakeShare(pos + 1, y));
+            var y = aes.DecryptCbc(keys[pos].Key, keys[pos].IV);
+            shares.Add(MakeShare(pos + 1, y ));
         }
         var gcd = new ExtendedEuclideanAlgorithm<BigInteger>();
         var split = new ShamirsSecretSharing<BigInteger>(gcd);
-        var secret = split.Reconstruction(shares.ToArray()).ToBase64();
-        return secret is not null && VerifyHashedPasswordV2(Convert.FromBase64String(hashedSecret), secret);
+        var secret = split.Reconstruction(shares.ToArray());
+        return VerifyHashedPasswordV2(Convert.FromBase64String(hashedSecret), secret);
     }
 
-    private string MakeShare(int pos, byte[] y)
+    private static string MakeShare(int pos, byte[] y)
     {
         StringBuilder sb = new();
         if (pos < 10 ) sb.Append('0');
         sb.Append(pos);
         sb.Append('-');
-        sb.Append(Convert.ToBase64String(y));
+        var hexRepresentation = new StringBuilder(y.Length * 2);
+        foreach (byte b in y)
+        {
+            const string hexAlphabet = "0123456789ABCDEF";
+            hexRepresentation.Append(hexAlphabet[b >> 4]).Append(hexAlphabet[b & 0xF]);
+        }
+
+        sb.Append(hexRepresentation);
         return sb.ToString();
     }
     
-    private static byte[] HashPassword(string password)
+    private static byte[] HashPassword(byte[] password)
     {
         const KeyDerivationPrf Pbkdf2Prf = KeyDerivationPrf.HMACSHA1; // default for Rfc2898DeriveBytes
         const int Pbkdf2IterCount = 1000; // default for Rfc2898DeriveBytes
@@ -122,7 +111,7 @@ public class PasswordService : IPasswordService
         byte[] salt = new byte[SaltSize];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(salt);
-        byte[] subkey = KeyDerivation.Pbkdf2(password, salt, Pbkdf2Prf, Pbkdf2IterCount, Pbkdf2SubkeyLength);
+        byte[] subkey = KeyDerivation.Pbkdf2(Encoding.UTF8.GetString(password), salt, Pbkdf2Prf, Pbkdf2IterCount, Pbkdf2SubkeyLength);
 
         var outputBytes = new byte[1 + SaltSize + Pbkdf2SubkeyLength];
         outputBytes[0] = 0x00; // format marker
@@ -131,7 +120,7 @@ public class PasswordService : IPasswordService
         return outputBytes;
     }
     
-      private static bool VerifyHashedPasswordV2(byte[] hashedPassword, string password)
+      private static bool VerifyHashedPasswordV2(byte[] hashedPassword, byte[] password)
      {
          const KeyDerivationPrf Pbkdf2Prf = KeyDerivationPrf.HMACSHA1; // default for Rfc2898DeriveBytes
          const int Pbkdf2IterCount = 1000; // default for Rfc2898DeriveBytes
@@ -151,7 +140,7 @@ public class PasswordService : IPasswordService
          Buffer.BlockCopy(hashedPassword, 1 + salt.Length, expectedSubkey, 0, expectedSubkey.Length);
  
          // Hash the incoming password and verify it
-         byte[] actualSubkey = KeyDerivation.Pbkdf2(password, salt, Pbkdf2Prf, Pbkdf2IterCount, Pbkdf2SubkeyLength);
+         byte[] actualSubkey = KeyDerivation.Pbkdf2(Encoding.UTF8.GetString(password), salt, Pbkdf2Prf, Pbkdf2IterCount, Pbkdf2SubkeyLength);
          return CryptographicOperations.FixedTimeEquals(actualSubkey, expectedSubkey);
      }
 }

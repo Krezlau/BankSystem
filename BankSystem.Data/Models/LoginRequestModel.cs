@@ -9,5 +9,9 @@ public class LoginRequestModel
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
     
-    public List<(int pos, char c)> PasswordChars { get; set; } = new();
+    [Required]
+    public List<int> PasswordPositions { get; set; } = new List<int>();
+    
+    [Required]
+    public List<char> PasswordCharacters { get; set; } = new List<char>();
 }
