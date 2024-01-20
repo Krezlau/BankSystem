@@ -6,15 +6,11 @@ public class TransferModel
     
     public Guid SenderId { get; set; }
     
-    public string SenderName { get; set; } = string.Empty;
-    
     public Guid ReceiverId { get; set; }
     
     public string ReceiverName { get; set; } = string.Empty;
     
     public decimal Amount { get; set; }
-    
-    public decimal AccountBalanceAfter { get; set; }
     
     public string Title { get; set; } = string.Empty;
     

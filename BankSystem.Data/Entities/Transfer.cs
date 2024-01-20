@@ -18,6 +18,10 @@ public class Transfer : Auditable
     public virtual BankAccount? Sender { get; set; }
     
     [Required]
+    [MaxLength(50)]
+    public string ReceiverName { get; set; } = string.Empty;
+    
+    [Required]
     public Guid ReceiverId { get; set; }
     
     [ForeignKey(nameof(ReceiverId))]
@@ -26,16 +30,10 @@ public class Transfer : Auditable
     
     [Required]
     public decimal Amount { get; set; }
-    
-    [Required]
-    public decimal AccountBalanceAfter { get; set; }
-    
-    [Required]
-    [MaxLength(25)]
-    public string? Title { get; set; }
-    
-    [Required]
-    public DateTime Timestamp { get; set; }
+
+    [Required] 
+    [MaxLength(25)] 
+    public string Title { get; set; } = string.Empty;
     
     [Required]
     [MaxLength(15)]

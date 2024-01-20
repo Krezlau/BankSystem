@@ -9,6 +9,10 @@ public class TransferSendModel
     public string RecipientBankAccountNumber { get; set; } = string.Empty;
     
     [Required]
+    [MaxLength(50)]
+    public string RecipientFullName { get; set; } = string.Empty;
+    
+    [Required]
     [MaxLength(25)]
     public string Title { get; set; } = string.Empty;
     

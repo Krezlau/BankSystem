@@ -1,4 +1,5 @@
 ﻿using BankSystem.Repositories.Auth;
+using BankSystem.Repositories.BankAccounts;
 using BankSystem.Repositories.Transfers;
 using BankSystem.Repositories.Users;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ILoginRequestRepository, LoginRequestRepository>();
         services.AddScoped<ITransferRepository, TransferRepository>();
+        services.AddScoped<IBankAccountRepository, BankAccountRepository>();
         
         return services;
     }

@@ -16,6 +16,7 @@ public class BankDbContext : DbContext
     public DbSet<BankAccount> BankAccounts { get; set; } = null!;
     public DbSet<PasswordKey> PasswordKeys { get; set; } = null!;
     public DbSet<LoginRequest> LoginRequests { get; set; } = null!;
+    public DbSet<Deposit> Deposits { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,6 +36,9 @@ public class BankDbContext : DbContext
             entity.HasIndex(x => x.AccountNumber).IsUnique();
             entity.HasIndex(x => x.CardNumber).IsUnique();
         });
+        
+        modelBuilder.Entity<BankAccount>()
+            .ToTable(b => b.HasCheckConstraint("CK_BankAccounts_Balance", "[AccountBalance] >= 0"));
         
         base.OnModelCreating(modelBuilder);
     }
