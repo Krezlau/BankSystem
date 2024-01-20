@@ -10,7 +10,7 @@ public interface IAuthService
 {
     Task<LoginCheckResponseModel> LoginCheckAsync(LoginCheckRequestModel model);
     
-    Task<bool> LoginAsync(LoginRequestModel model);
+    Task<AuthResponse> LoginAsync(LoginRequestModel model);
     
     Task<bool> RegisterAsync(RegisterRequestModel model);
 }
@@ -20,11 +20,13 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly ILoginRequestRepository _loginRequestRepository;
+    private readonly IJwtService _jwtService;
 
-    public AuthService(IUserRepository userRepository, ILoginRequestRepository loginRequestRepository)
+    public AuthService(IUserRepository userRepository, ILoginRequestRepository loginRequestRepository, IJwtService jwtService)
     {
         _userRepository = userRepository;
         _loginRequestRepository = loginRequestRepository;
+        _jwtService = jwtService;
     }
 
     public async Task<LoginCheckResponseModel> LoginCheckAsync(LoginCheckRequestModel model)
@@ -38,14 +40,19 @@ public class AuthService : IAuthService
         return new LoginCheckResponseModel(mask, loginRequest.Id);
     }
 
-    public async Task<bool> LoginAsync(LoginRequestModel model)
+    public async Task<AuthResponse> LoginAsync(LoginRequestModel model)
     {
         var loginRequest = await ValidateLoginRequestModelAndThrowAsync(model);
         
         var user = await _userRepository.GetUserWithPasswordAsync(model.Email);
-        if (user is null) return false;
+        if (user is null) return AuthResponseHelper.Failed(1);//todo count tries
+        
         var passwordChars = ParseMaskAndCharacters(loginRequest.Mask, model.PasswordCharacters);
-        return PasswordService.VerifyPassword(passwordChars, user.SecretHash, user.PasswordKeys);
+        if (!PasswordService.VerifyPassword(passwordChars, user.SecretHash, user.PasswordKeys))
+            return AuthResponseHelper.Failed(1); //todo count tries
+            
+        var token = _jwtService.GenerateJwtToken(user.Email, user.Id);
+        return AuthResponseHelper.Success(token);
     }
 
     public async Task<bool> RegisterAsync(RegisterRequestModel model)

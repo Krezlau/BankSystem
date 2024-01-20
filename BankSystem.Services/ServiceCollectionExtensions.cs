@@ -1,4 +1,5 @@
-﻿using BankSystem.Services.Auth;
+﻿using System.Collections.Immutable;
+using BankSystem.Services.Auth;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BankSystem.Services;
@@ -9,6 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IJwtService, JwtService>();
+        
         return services;
     }
 
