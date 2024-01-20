@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem.Data.Entities;
 
@@ -17,6 +16,9 @@ public class LoginRequest : Auditable
     
     [Required]
     public bool Consumed { get; set; } = false;
+    
+    [Required]
+    public bool Failed { get; set; } = false;
     
     [Required]
     public string Email { get; set; } = string.Empty;

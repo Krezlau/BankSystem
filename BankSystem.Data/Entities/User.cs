@@ -17,7 +17,13 @@ public class User : Auditable
     [Required]
     public string SecretHash { get; set; } = string.Empty;
     
-    public virtual List<PasswordKey> PasswordKeys { get; set; } = new();
+    public virtual List<PasswordKey> PasswordKeys { get; set; }
+    
+    [Required]
+    public bool IsLocked { get; set; } = false;
+    
+    [Required]
+    public DateTime LockedUntil { get; set; } = DateTime.UtcNow;
     
     [Required]
     [RegularExpression("^[a-zA-ZĘęÓóĄąŚśŁłŻżŹźĆćŃń ,.'-]+$")]
@@ -30,13 +36,13 @@ public class User : Auditable
     [Required]
     public decimal AccountBalance { get; set; }
     
-    public virtual UserSensitiveData SensitiveData { get; set; } = new();
+    public virtual UserSensitiveData SensitiveData { get; set; }
     
-    public virtual List<Transfer> TransfersSent { get; set; } = new();
+    public virtual List<Transfer> TransfersSent { get; set; }
     
-    public virtual List<Transfer> TransfersReceived { get; set; } = new();
+    public virtual List<Transfer> TransfersReceived { get; set; }
     
-    public virtual List<Login> Logins { get; set; } = new();
+    public virtual List<Login> Logins { get; set; }
     
-    public virtual DebitCard DebitCard { get; set; } = new();
+    public virtual DebitCard DebitCard { get; set; }
 }

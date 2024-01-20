@@ -136,6 +136,9 @@ namespace BankSystem.Data.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Failed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Mask")
                         .IsRequired()
                         .HasMaxLength(24)
@@ -250,9 +253,15 @@ namespace BankSystem.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LockedUntil")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SecretHash")
                         .IsRequired()

@@ -20,6 +20,14 @@ public static class AuthResponseHelper
     {
         Success = false,
         Message = "Invalid email or password.",
-        TryCountMessage = $"You have typed wrong password {tryCount} times. After 3 times your account will be locked."
+        TryCountMessage = tryCount >= 3
+            ? "Your account has been locked. Please wait one hour before trying again."
+            : $"You have typed wrong password {tryCount} times. After 3 times your account will be locked."
     }; 
+    
+    public static AuthResponse Locked() => new()
+    {
+        Success = false,
+        Message = "Your account has been locked. Please wait one hour before trying again.",
+    };
 }

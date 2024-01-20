@@ -8,6 +8,8 @@ public interface IUserRepository
 {
     Task<bool> CreateUserAsync(User user, List<PasswordKey> keys);
 
+    Task UpdateUserAsync(User user);
+
     Task<User?> GetUserWithPasswordAsync(string email);
 }
 
@@ -27,6 +29,12 @@ public class UserRepository : IUserRepository
         await _dbContext.AddRangeAsync(keys);
         await _dbContext.SaveChangesAsync();
         return true;
+    }
+
+    public async Task UpdateUserAsync(User user)
+    {
+        _dbContext.Users.Update(user);
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<User?> GetUserWithPasswordAsync(string email)
