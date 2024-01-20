@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
         return Ok(ApiResponseHelper.Success(await _authService.LoginCheckAsync(model)));
     }
 
-    [HttpPost]
+    [HttpPost("login")]
     [LogSignInAttempts]
     public async Task<IActionResult> Login([FromBody] LoginRequestModel model)
     {
