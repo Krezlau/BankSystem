@@ -23,7 +23,7 @@ public class TransferRepository : ITransferRepository
     public async Task<List<Transfer>> GetHistoryAsync(Guid userId)
     {
         return await _dbContext.Transfers
-            .Where(x => x.SenderId == userId || x.ReceiverId == userId)
+            .Where(x => x.Sender.UserId == userId || x.Receiver.UserId == userId)
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
     }

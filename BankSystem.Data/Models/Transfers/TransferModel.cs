@@ -15,6 +15,4 @@ public class TransferModel
     public string Title { get; set; } = string.Empty;
     
     public DateTime Timestamp { get; set; }
-    
-    public string? IpAddress { get; set; }
 }

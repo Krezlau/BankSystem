@@ -16,10 +16,13 @@ public class BankAccount : Auditable
     public virtual User? User { get; set; }
     
     [Required]
-    [MaxLength(26)]
-    public string AccountNumber { get; set; } = string.Empty;
+    [MaxLength(32)]
+    public string AccountNumber
+    {
+        get => Id.ToString("N").ToUpper();
+        protected set { }
+    }
 
-    [Required]
     public decimal AccountBalance
     {
         get => TransfersReceived.Sum(x => x.Amount) - TransfersSent.Sum(x => x.Amount) + Deposits.Sum(x => x.Amount);
@@ -37,10 +40,10 @@ public class BankAccount : Auditable
     [Required]
     [MaxLength(6)]
     public string ExpirationDate { get; set; } = string.Empty;
+
+    public virtual List<Transfer> TransfersSent { get; set; } = new();
+
+    public virtual List<Transfer> TransfersReceived { get; set; } = new();
     
-    public virtual List<Transfer> TransfersSent { get; set; }
-    
-    public virtual List<Transfer> TransfersReceived { get; set; }
-    
-    public virtual List<Deposit> Deposits { get; set; }
+    public virtual List<Deposit> Deposits { get; set; } = new();
 }

@@ -34,8 +34,4 @@ public class Transfer : Auditable
     [Required] 
     [MaxLength(25)] 
     public string Title { get; set; } = string.Empty;
-    
-    [Required]
-    [MaxLength(15)]
-    public string? IpAddress { get; set; }
 }

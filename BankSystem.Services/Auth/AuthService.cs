@@ -1,7 +1,9 @@
 ﻿using System.Text;
 using BankSystem.Data.Entities;
+using BankSystem.Data.Mapping;
 using BankSystem.Data.Models;
 using BankSystem.Repositories.Auth;
+using BankSystem.Repositories.BankAccounts;
 using BankSystem.Repositories.Users;
 
 namespace BankSystem.Services.Auth;
@@ -21,12 +23,17 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepository;
     private readonly ILoginRequestRepository _loginRequestRepository;
     private readonly IJwtService _jwtService;
+    private readonly IBankAccountRepository _bankAccountRepository;
 
-    public AuthService(IUserRepository userRepository, ILoginRequestRepository loginRequestRepository, IJwtService jwtService)
+    public AuthService(IUserRepository userRepository,
+        ILoginRequestRepository loginRequestRepository,
+        IJwtService jwtService,
+        IBankAccountRepository bankAccountRepository)
     {
         _userRepository = userRepository;
         _loginRequestRepository = loginRequestRepository;
         _jwtService = jwtService;
+        _bankAccountRepository = bankAccountRepository;
     }
 
     public async Task<LoginCheckResponseModel> LoginCheckAsync(LoginCheckRequestModel model)
@@ -71,14 +78,11 @@ public class AuthService : IAuthService
     public async Task<bool> RegisterAsync(RegisterRequestModel model)
     {
         var partialPassword = PasswordService.CreatePassword(model.Password);
-        var user = new User
-        {
-            Email = model.Email,
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            SecretHash = partialPassword.hashedSecret,
-        };
-        return await _userRepository.CreateUserAsync(user, partialPassword.keys);
+        var user = model.ToEntity(partialPassword);
+        await _userRepository.CreateUserAsync(user, partialPassword.keys);
+        await _bankAccountRepository.AssignCardNumberAsync(user.BankAccount);
+        await _bankAccountRepository.GiveUserOneHundredPLNAsync(user.BankAccount);
+        return true;
     }
     
     # region private methods

@@ -11,7 +11,6 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<BankDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
-            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
 
         return services;

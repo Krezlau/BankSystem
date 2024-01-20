@@ -5,7 +5,7 @@ namespace BankSystem.Data.Models.Transfers;
 public class TransferSendModel
 {
     [Required]
-    [RegularExpression("[0-9]{26}")]
+    [RegularExpression("[A-Z0-9]{32}")]
     public string RecipientBankAccountNumber { get; set; } = string.Empty;
     
     [Required]

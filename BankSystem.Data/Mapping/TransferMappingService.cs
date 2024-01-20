@@ -27,7 +27,6 @@ public static class TransferMappingService
             SenderId = entity.SenderId,
             ReceiverId = entity.ReceiverId,
             Timestamp = entity.CreatedAt,
-            IpAddress = entity.IpAddress,
             ReceiverName = entity.ReceiverName,
         };
     }

@@ -41,7 +41,7 @@ public class TransferService : ITransferService
 
         await _transferRepository.SendAsync(userId, transfer);
         
-        return sender.AccountBalance - model.Amount;
+        return sender.AccountBalance;
     }
 
     public async Task<List<TransferModel>> GetHistoryAsync(Guid userId)
