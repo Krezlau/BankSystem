@@ -15,14 +15,14 @@ public class Transfer : Auditable
     
     [ForeignKey(nameof(SenderId))]
     [DeleteBehavior(DeleteBehavior.NoAction)]
-    public virtual User? Sender { get; set; }
+    public virtual BankAccount? Sender { get; set; }
     
     [Required]
     public Guid ReceiverId { get; set; }
     
     [ForeignKey(nameof(ReceiverId))]
     [DeleteBehavior(DeleteBehavior.NoAction)]
-    public virtual User? Receiver { get; set; }
+    public virtual BankAccount? Receiver { get; set; }
     
     [Required]
     public decimal Amount { get; set; }

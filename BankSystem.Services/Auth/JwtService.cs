@@ -9,9 +9,6 @@ namespace BankSystem.Services.Auth;
 public interface IJwtService
 {
     string GenerateJwtToken(string email, Guid userId);
-    
-    Guid GetUserIdFromJwtToken(string token);
-    
 }
 
 public class JwtService : IJwtService
@@ -41,7 +38,7 @@ public class JwtService : IJwtService
         return tokenHandler.WriteToken(token);
     }
 
-    public Guid GetUserIdFromJwtToken(string token)
+    public static Guid GetUserIdFromJwtToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);

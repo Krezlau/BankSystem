@@ -4,6 +4,7 @@ using BankSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankSystem.Data.Migrations
 {
     [DbContext(typeof(BankDbContext))]
-    partial class BankDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240120150948_LoginRequestFailed")]
+    partial class LoginRequestFailed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,19 +25,11 @@ namespace BankSystem.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BankSystem.Data.Entities.BankAccount", b =>
+            modelBuilder.Entity("BankSystem.Data.Entities.DebitCard", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("AccountBalance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("AccountNumber")
-                        .IsRequired()
-                        .HasMaxLength(26)
-                        .HasColumnType("nvarchar(26)");
 
                     b.Property<string>("CardNumber")
                         .IsRequired()
@@ -65,7 +60,7 @@ namespace BankSystem.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("BankAccounts");
+                    b.ToTable("DebitCards");
                 });
 
             modelBuilder.Entity("BankSystem.Data.Entities.Login", b =>
@@ -246,6 +241,9 @@ namespace BankSystem.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal>("AccountBalance")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -316,11 +314,11 @@ namespace BankSystem.Data.Migrations
                     b.ToTable("UserSensitiveData");
                 });
 
-            modelBuilder.Entity("BankSystem.Data.Entities.BankAccount", b =>
+            modelBuilder.Entity("BankSystem.Data.Entities.DebitCard", b =>
                 {
                     b.HasOne("BankSystem.Data.Entities.User", "User")
-                        .WithOne("BankAccount")
-                        .HasForeignKey("BankSystem.Data.Entities.BankAccount", "UserId")
+                        .WithOne("DebitCard")
+                        .HasForeignKey("BankSystem.Data.Entities.DebitCard", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -351,13 +349,13 @@ namespace BankSystem.Data.Migrations
 
             modelBuilder.Entity("BankSystem.Data.Entities.Transfer", b =>
                 {
-                    b.HasOne("BankSystem.Data.Entities.BankAccount", "Receiver")
+                    b.HasOne("BankSystem.Data.Entities.User", "Receiver")
                         .WithMany("TransfersReceived")
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("BankSystem.Data.Entities.BankAccount", "Sender")
+                    b.HasOne("BankSystem.Data.Entities.User", "Sender")
                         .WithMany("TransfersSent")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -379,16 +377,9 @@ namespace BankSystem.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BankSystem.Data.Entities.BankAccount", b =>
-                {
-                    b.Navigation("TransfersReceived");
-
-                    b.Navigation("TransfersSent");
-                });
-
             modelBuilder.Entity("BankSystem.Data.Entities.User", b =>
                 {
-                    b.Navigation("BankAccount")
+                    b.Navigation("DebitCard")
                         .IsRequired();
 
                     b.Navigation("Logins");
@@ -397,6 +388,10 @@ namespace BankSystem.Data.Migrations
 
                     b.Navigation("SensitiveData")
                         .IsRequired();
+
+                    b.Navigation("TransfersReceived");
+
+                    b.Navigation("TransfersSent");
                 });
 #pragma warning restore 612, 618
         }

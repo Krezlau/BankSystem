@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem.Data.Entities;
 
-public class DebitCard : Auditable
+public class BankAccount : Auditable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -14,6 +14,17 @@ public class DebitCard : Auditable
     
     [ForeignKey(nameof(UserId))]
     public virtual User? User { get; set; }
+    
+    [Required]
+    [MaxLength(26)]
+    public string AccountNumber { get; set; } = string.Empty;
+    
+    [Required]
+    public decimal AccountBalance { get; set; }
+    
+    public virtual List<Transfer> TransfersSent { get; set; }
+    
+    public virtual List<Transfer> TransfersReceived { get; set; }
     
     [Required]
     [MaxLength(16)]

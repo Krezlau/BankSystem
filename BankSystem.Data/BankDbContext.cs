@@ -13,7 +13,7 @@ public class BankDbContext : DbContext
     public DbSet<Transfer> Transfers { get; set; } = null!;
     public DbSet<UserSensitiveData> UserSensitiveData { get; set; } = null!;
     public DbSet<Login> Logins { get; set; } = null!;
-    public DbSet<DebitCard> DebitCards { get; set; } = null!;
+    public DbSet<BankAccount> BankAccounts { get; set; } = null!;
     public DbSet<PasswordKey> PasswordKeys { get; set; } = null!;
     public DbSet<LoginRequest> LoginRequests { get; set; } = null!;
     
@@ -28,6 +28,12 @@ public class BankDbContext : DbContext
         {
             entity.HasOne(x => x.Sender).WithMany(x => x.TransfersSent);
             entity.HasOne(x => x.Receiver).WithMany(x => x.TransfersReceived);
+        });
+
+        modelBuilder.Entity<BankAccount>(entity =>
+        {
+            entity.HasIndex(x => x.AccountNumber).IsUnique();
+            entity.HasIndex(x => x.CardNumber).IsUnique();
         });
         
         base.OnModelCreating(modelBuilder);

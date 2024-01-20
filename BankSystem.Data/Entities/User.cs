@@ -33,16 +33,9 @@ public class User : Auditable
     [RegularExpression("^[a-zA-ZĘęÓóĄąŚśŁłŻżŹźĆćŃń ,.'-]+$")]
     public string LastName { get; set; } = string.Empty;
     
-    [Required]
-    public decimal AccountBalance { get; set; }
-    
     public virtual UserSensitiveData SensitiveData { get; set; }
-    
-    public virtual List<Transfer> TransfersSent { get; set; }
-    
-    public virtual List<Transfer> TransfersReceived { get; set; }
     
     public virtual List<Login> Logins { get; set; }
     
-    public virtual DebitCard DebitCard { get; set; }
+    public virtual BankAccount BankAccount { get; set; }
 }
