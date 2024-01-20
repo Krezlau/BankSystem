@@ -31,8 +31,8 @@ public class Transfer : Auditable
     public decimal AccountBalanceAfter { get; set; }
     
     [Required]
-    [MaxLength(100)]
-    public string? Description { get; set; }
+    [MaxLength(25)]
+    public string? Title { get; set; }
     
     [Required]
     public DateTime Timestamp { get; set; }

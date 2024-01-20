@@ -1,4 +1,5 @@
 ﻿using BankSystem.Data.Models;
+using BankSystem.Data.Models.Transfers;
 using BankSystem.Services.Transfers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +19,16 @@ public class TransfersController : BankApiController
     }
     
     [HttpPost("send")]
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Create([FromBody] TransferSendModel model)
     {
         var userId = GetUserId(Request);
-        return Ok(ApiResponseHelper.Success());
+        return Ok(ApiResponseHelper.Success(await _transferService.SendAsync(userId, model)));
     }
     
     [HttpGet("history")]
     public async Task<IActionResult> GetHistory()
     {
         var userId = GetUserId(Request);
-        return Ok(ApiResponseHelper.Success());
+        return Ok(ApiResponseHelper.Success(await _transferService.GetHistoryAsync(userId)));
     }
 }
