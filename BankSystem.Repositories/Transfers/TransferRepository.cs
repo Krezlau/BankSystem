@@ -30,7 +30,23 @@ public class TransferRepository : ITransferRepository
 
     public async Task SendAsync(Guid userId, Transfer entity)
     {
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        
         _dbContext.Transfers.Add(entity);
         await _dbContext.SaveChangesAsync();
+        
+        // Update sender's account balance
+        var sender = await _dbContext.BankAccounts.Where(x => x.Id == entity.SenderId).FirstOrDefaultAsync();
+        sender.AccountBalance -= entity.Amount;
+        _dbContext.BankAccounts.Update(sender);
+        
+        // Update receiver's account balance
+        var receiver = await _dbContext.BankAccounts.Where(x => x.Id == entity.ReceiverId).FirstOrDefaultAsync();
+        receiver.AccountBalance += entity.Amount;
+        _dbContext.BankAccounts.Update(receiver);
+        
+        await _dbContext.SaveChangesAsync();
+        
+        await transaction.CommitAsync();
     }
 }

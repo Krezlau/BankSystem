@@ -23,11 +23,8 @@ public class BankAccount : Auditable
         protected set { }
     }
 
-    public decimal AccountBalance
-    {
-        get => TransfersReceived.Sum(x => x.Amount) - TransfersSent.Sum(x => x.Amount) + Deposits.Sum(x => x.Amount);
-        protected set { }
-    }
+    [Required]
+    public decimal AccountBalance { get; set; }
     
     [Required]
     [MaxLength(16)]
