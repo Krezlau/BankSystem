@@ -86,5 +86,6 @@ app.UseCors(options =>
 
 app.MapControllers();
 app.UseMiddleware<SignInAttemptLoggerMiddleware>();
+app.UseMiddleware<ExceptionHandler>();
 
 app.Run();
