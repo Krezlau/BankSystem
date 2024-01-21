@@ -15,6 +15,8 @@ public interface IAuthService
     Task<AuthResponse> LoginAsync(LoginRequestModel model);
     
     Task<bool> RegisterAsync(RegisterRequestModel model);
+    
+    Task<bool> ChangePasswordAsync(ChangePasswordRequestModel model, Guid userId);
 }
 
 
@@ -51,7 +53,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginRequestModel model)
     {
-        var loginRequest = await ValidateLoginRequestModelAndThrowAsync(model);
+        var loginRequest = await ValidateLoginRequestModelAndThrowAsync(model.PasswordCharacters, model.Email, model.Key);
         
         var user = await _userRepository.GetUserWithPasswordAsync(model.Email);
         if (user is null)
@@ -84,22 +86,38 @@ public class AuthService : IAuthService
         await _bankAccountRepository.GiveUserOneHundredPLNAsync(user.BankAccount);
         return true;
     }
-    
+
+    public async Task<bool> ChangePasswordAsync(ChangePasswordRequestModel model, Guid userId)
+    {
+        var user = await _userRepository.GetUserWithPasswordAsync(userId);
+        if (user is null) return false;
+        
+        var loginRequest = await ValidateLoginRequestModelAndThrowAsync(model.PasswordCharacters, user.Email, model.Key);
+        
+        var passwordChars = ParseMaskAndCharacters(loginRequest.Mask, model.PasswordCharacters);
+        if (!PasswordService.VerifyPassword(passwordChars, user.SecretHash, user.PasswordKeys))
+            return (await FailRequestAsync(user, user.Email, loginRequest)).Success;
+        
+        var newPassword = PasswordService.CreatePassword(model.NewPassword);
+        await _userRepository.UpdateUserPasswordAsync(user, newPassword.hashedSecret, newPassword.keys);
+        return true;
+    }
+
     # region private methods
     
-    private async Task<LoginRequest> ValidateLoginRequestModelAndThrowAsync(LoginRequestModel model)
+    private async Task<LoginRequest> ValidateLoginRequestModelAndThrowAsync(string passwordCharacters, string email, Guid key)
     {
         const string message = "Something went wrong. Try again later.";
         
-        if (model.PasswordCharacters.Length != 5)
+        if (passwordCharacters.Length != 5)
             throw new ArgumentException(message);
         
-        var loginRequest = await _loginRequestRepository.GetLoginRequestAsync(model.Key);
+        var loginRequest = await _loginRequestRepository.GetLoginRequestAsync(key);
 
         if (loginRequest is null ||
             loginRequest.Consumed ||
             DateTime.UtcNow > loginRequest.ExpiresAt ||
-            loginRequest.Email != model.Email)
+            loginRequest.Email != email)
         {
             throw new ArgumentException(message);
         }

@@ -9,8 +9,12 @@ public interface IUserRepository
     Task<bool> CreateUserAsync(User user, List<PasswordKey> keys);
 
     Task UpdateUserAsync(User user);
+    
+    Task UpdateUserPasswordAsync(User user, string hashedSecret, List<PasswordKey> keys);
 
     Task<User?> GetUserWithPasswordAsync(string email);
+    
+    Task<User?> GetUserWithPasswordAsync(Guid userId);
     
     Task<UserSensitiveData?> GetUserSensitiveDataAsync(Guid userId);
 }
@@ -39,6 +43,16 @@ public class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task UpdateUserPasswordAsync(User user, string hashedSecret, List<PasswordKey> keys)
+    {
+        //_dbContext.PasswordKeys.RemoveRange(user.PasswordKeys);
+        // await _dbContext.PasswordKeys.AddRangeAsync(keys);
+        user.SecretHash = hashedSecret;
+        user.PasswordKeys = keys;
+        _dbContext.Users.Update(user);
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async Task<User?> GetUserWithPasswordAsync(string email)
     {
         return await _dbContext.Users
@@ -46,6 +60,14 @@ public class UserRepository : IUserRepository
             .Include(x => x.PasswordKeys)
             .FirstOrDefaultAsync();
 
+    }
+
+    public async Task<User?> GetUserWithPasswordAsync(Guid userId)
+    {
+        return await _dbContext.Users
+            .Where(x => x.Id == userId)
+            .Include(x => x.PasswordKeys)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<UserSensitiveData?> GetUserSensitiveDataAsync(Guid userId)

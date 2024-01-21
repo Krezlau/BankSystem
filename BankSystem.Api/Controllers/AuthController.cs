@@ -1,13 +1,14 @@
 ﻿using BankSystem.Api.Middleware;
 using BankSystem.Data.Models;
 using BankSystem.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankSystem.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController : BankApiController
 {
     private readonly IAuthService _authService;
 
@@ -35,4 +36,11 @@ public class AuthController : ControllerBase
         return Ok(ApiResponseHelper.Success(await _authService.RegisterAsync(model)));
     }
     
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel model)
+    {
+        var userId = GetUserId(Request);
+        return Ok(ApiResponseHelper.Success(await _authService.ChangePasswordAsync(model, userId)));
+    }
 }
