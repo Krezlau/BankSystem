@@ -11,6 +11,8 @@ public interface IUserRepository
     Task UpdateUserAsync(User user);
 
     Task<User?> GetUserWithPasswordAsync(string email);
+    
+    Task<UserSensitiveData?> GetUserSensitiveDataAsync(Guid userId);
 }
 
 public class UserRepository : IUserRepository
@@ -44,5 +46,12 @@ public class UserRepository : IUserRepository
             .Include(x => x.PasswordKeys)
             .FirstOrDefaultAsync();
 
+    }
+
+    public async Task<UserSensitiveData?> GetUserSensitiveDataAsync(Guid userId)
+    {
+        return await _dbContext.UserSensitiveData
+            .Where(x => x.UserId == userId)
+            .FirstOrDefaultAsync();
     }
 }

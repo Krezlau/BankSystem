@@ -8,6 +8,8 @@ namespace BankSystem.Repositories.BankAccounts;
 public interface IBankAccountRepository
 {
     Task<(BankAccount? recipient, BankAccount? sender)> GetBankAccountsAsync(string recipientBankAccountNumber, Guid senderId);
+    
+    Task<BankAccount?> GetBankAccountAsync(Guid userId);
 
     Task GiveUserOneHundredPLNAsync(BankAccount bankAccount);
     
@@ -39,6 +41,11 @@ public class BankAccountRepository : IBankAccountRepository
             .FirstOrDefaultAsync(x => x.UserId == senderId);
 
         return (recipient, sender);
+    }
+
+    public async Task<BankAccount?> GetBankAccountAsync(Guid userId)
+    {
+        return await _dbContext.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userId);
     }
 
     public async Task GiveUserOneHundredPLNAsync(BankAccount bankAccount)
