@@ -1,3 +1,18 @@
 <main data-theme="light" class="h-screen w-full text-white">
   <router-outlet></router-outlet>
 </main>
+
+<div
+  [ngClass]="{
+    'alert text-white shadow-xl fixed w-[30rem] rounded left-[calc(50%-15rem)] z-30 transform duration-200 ease-in': true,
+    '-bottom-20': (alert$ | async )?.isVisible === false,
+    'bottom-4': (alert$ | async)?.isVisible,
+    'bg-green-500': (alert$ | async)?.type === 'success',
+    'bg-yellow-500': (alert$ | async)?.type === 'warning',
+    'bg-sky-500': (alert$ | async)?.type === 'info',
+    'bg-red-500': (alert$ | async)?.type === 'error'
+  }"
+  (click)="alertHide()"
+>
+  <span>{{ (alert$ | async)?.message }}</span>
+</div>
