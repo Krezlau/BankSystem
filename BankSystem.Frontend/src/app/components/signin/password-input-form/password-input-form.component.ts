@@ -12,6 +12,6 @@ import {AsapAction} from "rxjs/internal/scheduler/AsapAction";
   templateUrl: './password-input-form.component.html'
 })
 export class PasswordInputFormComponent {
-  mask = "010101010100000000000000".split('')
+  mask = "010101010100000000000010".split('')
   protected readonly AsapAction = AsapAction;
 }
