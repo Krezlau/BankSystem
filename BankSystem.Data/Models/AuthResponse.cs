@@ -8,6 +8,8 @@ public class AuthResponse
     
     public Guid? UserId { get; set; }
     
+    public string? Email { get; set; }
+    
     public string? Message { get; set; }
     
     public string? TryCountMessage { get; set; }
@@ -16,7 +18,13 @@ public class AuthResponse
 
 public static class AuthResponseHelper
 {
-    public static AuthResponse Success(string token, Guid userId) => new() { Success = true, Token = token, UserId = userId};
+    public static AuthResponse Success(string token, Guid userId, string email) => new()
+    {
+        Success = true,
+        Token = token,
+        UserId = userId,
+        Email = email,
+    };
     
     public static AuthResponse Failed(int tryCount) => new()
     {

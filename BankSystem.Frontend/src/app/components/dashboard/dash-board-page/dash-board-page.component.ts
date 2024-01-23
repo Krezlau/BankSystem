@@ -67,6 +67,12 @@ export class DashBoardPageComponent implements OnInit, OnDestroy{
     this.AmountControl.reset();
   }
 
+  changePassword(): void {
+    this.authService.loginCheck(this.authService.getAuthState()().userEmail).subscribe((res) => {
+      if (res.success && res.data) this.router.navigate(['/change-password', res.data.key], {queryParams: {email: this.authService.getAuthState()().userEmail, mask: res.data.mask}});
+    });
+  }
+
   sumbitTransfer(): void {
     if (this.AmountControl.invalid || !this.AmountControl.value) {
       this.alertService.show("Invalid amount", "error");

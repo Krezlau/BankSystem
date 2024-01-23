@@ -85,7 +85,7 @@ export class SignUpFormComponent {
       console.log(this.idControl.value)
       return;
     }
-    if (this.passwordStrength < 60) {
+    if (this.checkStrength(this.passwordControl.value) < 60) {
       this.alertService.show('Password too weak', 'error');
       return;
     }

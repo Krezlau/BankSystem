@@ -1,5 +1,5 @@
 import {Injectable, signal} from '@angular/core';
-import {finalize, Subscription, tap} from "rxjs";
+import {finalize, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Router} from "@angular/router";
 import moment from "moment";
@@ -15,6 +15,7 @@ export class AuthService {
     authToken: '',
     isLoggedIn: false,
     userId: '',
+    userEmail: '',
   };
   private _authStateSignal = signal(this._authState);
 
@@ -83,11 +84,39 @@ export class AuthService {
       );
   }
 
+  changePassword(key: string, passwordCharacters: string, newPassword: string) {
+    this.isLoading.set(true);
+    return this.http
+      .post<ApiResponse<IAuthResponse>>('http://localhost:5077/api/auth/change-password', {
+        key, passwordCharacters, newPassword
+      }, {headers: {Authorization: `Bearer ${this.getAuthState()().authToken}`}})
+      .pipe(
+        finalize(() => {
+          this.isLoading.set(false);
+        }),
+        tap(
+          (res) => {
+            if (!res.data) {
+              this.alertService.show("Could not change the password", 'error');
+              this.router.navigate(["/dashboard"]);
+              throw res;
+            }
+
+            const resp = res.data as IAuthResponse;
+            this.alertService.show('Successfully changed the password.', 'success');
+            this.router.navigate(['/dashboard']);
+          },
+          (error: IAuthResponse) => this.handleAuthError(error),
+        ),
+      );
+  }
+
   logout() {
     this._authState = {
       authToken: '',
       isLoggedIn: false,
       userId: '',
+      userEmail: '',
     };
     this._authStateSignal.set(this._authState);
     localStorage.removeItem('authState');
@@ -140,6 +169,7 @@ export class AuthService {
       authToken: resp.token,
       isLoggedIn: true,
       userId: resp.userId,
+      userEmail: resp.email,
     };
     this._authStateSignal.set(this._authState);
     localStorage.setItem('authState', JSON.stringify(this._authState));
@@ -165,6 +195,7 @@ export interface IAuthResponse {
   success: boolean;
   token: string;
   userId: string;
+  email: string;
   message?: string;
   tryCountMessage?: string;
 }
