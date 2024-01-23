@@ -6,6 +6,8 @@ public class AuthResponse
     
     public string? Token { get; set; }
     
+    public Guid? UserId { get; set; }
+    
     public string? Message { get; set; }
     
     public string? TryCountMessage { get; set; }
@@ -14,7 +16,7 @@ public class AuthResponse
 
 public static class AuthResponseHelper
 {
-    public static AuthResponse Success(string token) => new() { Success = true, Token = token };
+    public static AuthResponse Success(string token, Guid userId) => new() { Success = true, Token = token, UserId = userId};
     
     public static AuthResponse Failed(int tryCount) => new()
     {

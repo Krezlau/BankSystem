@@ -9,6 +9,7 @@ public static class BankAccountMappingService
     {
         return new()
         {
+            Id = bankAccount.Id,
             AccountBalance = bankAccount.AccountBalance,
             AccountNumber = bankAccount.AccountNumber,
             CardNumber = bankAccount.CardNumber,

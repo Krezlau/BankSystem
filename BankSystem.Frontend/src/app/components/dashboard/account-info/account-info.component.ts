@@ -14,4 +14,7 @@ import {NgIf} from "@angular/common";
 export class AccountInfoComponent {
   @Input() accountdata: ApiResponse<BankAccount> | null = null;
   @Input() accountLoading = false;
+  @Input() userLoading = false;
+  @Input() firstName = "";
+  @Input() lastName = "";
 }

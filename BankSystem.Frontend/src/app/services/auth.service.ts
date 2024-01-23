@@ -94,7 +94,7 @@ export class AuthService {
     this._authStateSignal.set(this._authState);
     localStorage.removeItem('authState');
     this.alertService.show('You have been logged out.', 'info');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   // register(username: string, password: string, email: string) {

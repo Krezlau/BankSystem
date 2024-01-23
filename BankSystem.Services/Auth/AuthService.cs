@@ -74,7 +74,7 @@ public class AuthService : IAuthService
             return await FailRequestAsync(user, model.Email, loginRequest);
             
         var token = _jwtService.GenerateJwtToken(user.Email, user.Id);
-        return AuthResponseHelper.Success(token);
+        return AuthResponseHelper.Success(token, user.Id);
     }
 
     public async Task<bool> RegisterAsync(RegisterRequestModel model)

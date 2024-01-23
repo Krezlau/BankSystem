@@ -2,6 +2,7 @@
 
 public class BankAccountModel
 {
+    public Guid Id { get; set; }
     public string AccountNumber { get; set; } = string.Empty;
     
     public decimal AccountBalance { get; set; }
