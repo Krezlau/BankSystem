@@ -19,7 +19,8 @@ public class RegisterRequestModel
     public string LastName { get; set; } = string.Empty;
     
     [Required]
-    [Length(24, 24)]
+    [MinLength(12)]
+    [MaxLength(24)]
     public string Password { get; set; } = string.Empty;
     
     # endregion
@@ -31,7 +32,7 @@ public class RegisterRequestModel
     public string IdNumber { get; set; } = string.Empty;
     
     [Required]
-    [Phone]
+    [RegularExpression("^[0-9]{9}$")]
     public string PhoneNumber { get; set; } = string.Empty;
     
     # endregion

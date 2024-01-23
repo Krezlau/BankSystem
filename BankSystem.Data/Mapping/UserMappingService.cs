@@ -34,7 +34,8 @@ public static class UserMappingService
         {
             CardNumber = string.Empty,
             Cvv = cvv,
-            ExpirationDate = expirationDate
+            ExpirationDate = expirationDate,
+            AccountBalance = 100
         };
     }
 }

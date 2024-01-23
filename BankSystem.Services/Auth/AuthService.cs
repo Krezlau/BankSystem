@@ -83,7 +83,6 @@ public class AuthService : IAuthService
         var user = model.ToEntity(partialPassword);
         await _userRepository.CreateUserAsync(user, partialPassword.keys);
         await _bankAccountRepository.AssignCardNumberAsync(user.BankAccount);
-        await _bankAccountRepository.GiveUserOneHundredPLNAsync(user.BankAccount);
         return true;
     }
 
