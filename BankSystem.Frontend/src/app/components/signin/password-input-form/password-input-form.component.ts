@@ -31,6 +31,7 @@ export class PasswordInputFormComponent implements OnInit, OnDestroy {
     passwordControl5: new FormControl('', [Validators.required, Validators.maxLength(1)]),
   })
 
+  isLoading = this.authService.isLoading;
   sub = new Subscription();
 
   constructor(private route: ActivatedRoute, private alertService: AlertService, private router: Router, private authService: AuthService) {

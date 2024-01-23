@@ -36,6 +36,8 @@ export class DashBoardPageComponent implements OnInit, OnDestroy{
   userLoading = signal(false);
   accountLoading = signal(false);
   transfersLoading = signal(false);
+  changePasswordLoading = this.authService.isLoading;
+  transferLoading = this.userService.sendTransferLoading;
 
   sub = new Subscription();
 

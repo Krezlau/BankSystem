@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgClass, NgForOf, NgIf} from "@angular/common";
-import {ActivatedRoute, Route, Router} from "@angular/router";
+import {ActivatedRoute, Route, Router, RouterLink} from "@angular/router";
 import {Subscription} from "rxjs";
 import {AlertService} from "../../../services/alert.service";
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
@@ -18,7 +18,8 @@ import {
     NgClass,
     NgForOf,
     NgIf,
-    PasswordStrengthIndicatorComponent
+    PasswordStrengthIndicatorComponent,
+    RouterLink
   ],
   templateUrl: './change-password-form.component.html'
 })

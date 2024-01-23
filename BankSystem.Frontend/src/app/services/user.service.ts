@@ -31,8 +31,11 @@ export class UserService {
       }}).pipe(
       finalize(() => this.sendTransferLoading.set(false)),
       tap((response) => {},
-        (error) => this.alertService.show(error.error.message, 'error'))
-    )
+        (error) => {
+        if (error.statusCode===401) this.authService.logout();
+          this.alertService.show(error.error.message, 'error')
+        }
+    ))
   }
 
   getTransfers() {
@@ -42,8 +45,11 @@ export class UserService {
       }}).pipe(
       finalize(() => this.transfersLoading.set(false)),
       tap((response) => {},
-        (error) => this.alertService.show(error.error.message, 'error'))
-    )
+        (error) => {
+          if (error.statusCode===401) this.authService.logout();
+          this.alertService.show(error.error.message, 'error')
+        }
+    ))
   }
 
   getAccount() {
@@ -53,8 +59,11 @@ export class UserService {
       }}).pipe(
       finalize(() => this.accountLoading.set(false)),
       tap((response) => {},
-        (error) => this.alertService.show(error.error.message, 'error'))
-    )
+        (error) => {
+          if (error.statusCode===401) this.authService.logout();
+          this.alertService.show(error.error.message, 'error')
+        }
+    ))
   }
 
   getSensitiveData() {
@@ -64,7 +73,10 @@ export class UserService {
       }}).pipe(
       finalize(() => this.userLoading.set(false)),
       tap((response) => {},
-        (error) => this.alertService.show(error.error.message, 'error'))
-    )
+        (error) => {
+          if (error.statusCode===401) this.authService.logout();
+          this.alertService.show(error.error.message, 'error')
+        }
+    ))
   }
 }

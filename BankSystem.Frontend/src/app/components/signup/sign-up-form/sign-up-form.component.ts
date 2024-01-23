@@ -6,6 +6,7 @@ import {Subscription} from "rxjs";
 import {
   PasswordStrengthIndicatorComponent
 } from "../../password-strength-indicator/password-strength-indicator.component";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-sign-up-form',
@@ -13,7 +14,8 @@ import {
   imports: [
     ReactiveFormsModule,
     FormsModule,
-    PasswordStrengthIndicatorComponent
+    PasswordStrengthIndicatorComponent,
+    NgIf
   ],
   templateUrl: './sign-up-form.component.html'
 })
@@ -28,8 +30,7 @@ export class SignUpFormComponent {
   phoneControl = new FormControl('', [Validators.required, Validators.pattern('^[0-9]{9}$')]);
   idControl = new FormControl('', [Validators.required, Validators.pattern(/^[A-Z]{3}\s[\d]{6}$/)]);
 
-  passwordStrength = 0;
-
+  isLoading = this.authService.isLoading;
   constructor(private alertService: AlertService, private authService: AuthService) {
   }
 
