@@ -16,6 +16,7 @@ export class AlertService {
   constructor() {}
 
   show(alert: string, alertType: 'success' | 'info' | 'warning' | 'error') {
+    console.log(alert)
     if (this._alertSubject.getValue().isVisible) {
       this.hide();
       setTimeout(() => {

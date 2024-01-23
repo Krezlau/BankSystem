@@ -19,8 +19,7 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    //this.authService.retrieveAuthState();
-    this.alertService.show('Welcome to BankSystem!', 'success');
+    this.authService.retrieveAuthState();
   }
 
   alertHide() {
