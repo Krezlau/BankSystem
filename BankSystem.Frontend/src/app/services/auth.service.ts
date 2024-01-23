@@ -125,11 +125,11 @@ export class AuthService {
     const response = err.error as ApiResponse<IAuthResponse>;
     if (!response.data) {
       this.alertService.show(response.message, 'error');
-      return;
     }
     else {
       this.alertService.show(response.data.tryCountMessage!, 'error');
     }
+    this.router.navigate(["/sign-in"]);
   }
 
   private handleAuthResponse(res: ApiResponse<IAuthResponse>, isRegister = false) {
@@ -140,6 +140,7 @@ export class AuthService {
         this.alertService.show(data.tryCountMessage, 'error');
       else
         this.alertService.show(data.message!, 'error');
+      this.router.navigate(["/sign-in"]);
       throw res;
     }
     if (!res.data || !res.data.success) { return; }

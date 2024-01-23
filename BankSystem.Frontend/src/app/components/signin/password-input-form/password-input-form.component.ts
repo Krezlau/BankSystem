@@ -52,7 +52,6 @@ export class PasswordInputFormComponent implements OnInit, OnDestroy {
     this.authService.sendLoginRequest(this.email, this.key, password).subscribe((res) => {
       if (res.success) {
         this.alertService.show("Successfully logged in", "success");
-        //this.router.navigate(['/dashboard']);
       }
     });
   }

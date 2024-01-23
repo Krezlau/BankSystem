@@ -12,6 +12,7 @@ import {AsyncPipe} from "@angular/common";
 import {AuthService} from "../../../services/auth.service";
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {AlertService} from "../../../services/alert.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-dash-board-page',
@@ -51,7 +52,7 @@ export class DashBoardPageComponent implements OnInit, OnDestroy{
 
   RecipientControl = new FormControl('', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]);
 
-  constructor(private userService: UserService, private authService: AuthService, private alertService: AlertService) {
+  constructor(private userService: UserService, private authService: AuthService, private alertService: AlertService, private router: Router){
     this.userLoading = userService.userLoading;
     this.accountLoading = userService.accountLoading;
     this.transfersLoading = userService.transfersLoading;
@@ -96,6 +97,11 @@ export class DashBoardPageComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
+    if (!this.authService.getAuthState()().isLoggedIn) {
+      this.alertService.show("You are not logged in", "error");
+      this.router.navigate(['/']);
+      return;
+    }
     this.sub.add(this.userService.getTransfers().subscribe(
       (data) => { this.transferHistory = data; }
     ));
