@@ -3,12 +3,12 @@
   <h2 class="italic text-xl">Debit card</h2>
   <div class="flex flex-row justify-between px-12 py-2">
     <div>
-      <p class="font-bold">1234 1234 1234 1234</p>
-      <p>12/23</p>
+      <p class="font-bold">{{ getCardNumber() }}</p>
+      <p>{{accountdata?.data?.expirationDate}}</p>
     </div>
     <div class="flex flex-row gap-4">
-      <button class="btn">Show</button>
-      <p class="text-4xl font-extrabold blur">123</p>
+      <button class="btn" (click)="toggleCvvVisible()">Show</button>
+      <p [ngClass]="{'text-4xl font-extrabold' : true, 'blur': !cvvVisible }">{{accountdata?.data?.cvv}}</p>
       <p class="my-auto text-2xl">CVV</p>
     </div>
   </div>
@@ -20,8 +20,8 @@
         <p>Id Number:</p>
       </div>
       <div>
-        <p>123456789</p>
-        <p>ABC 123456</p>
+        <p>{{ getPhoneNumber() }}</p>
+        <p>{{userSensitiveData?.data?.idNumber}}</p>
       </div>
     </div>
   </div>

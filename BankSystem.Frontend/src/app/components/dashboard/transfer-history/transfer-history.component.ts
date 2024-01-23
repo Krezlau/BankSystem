@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {TransferComponent} from "../transfer/transfer.component";
 import {NgForOf} from "@angular/common";
+import ApiResponse from "../../../types/ApiResponse";
+import Transfer from "../../../types/Transfer";
 
 @Component({
   selector: 'app-transfer-history',
@@ -12,6 +14,7 @@ import {NgForOf} from "@angular/common";
   templateUrl: './transfer-history.component.html'
 })
 export class TransferHistoryComponent {
-  transfers: number[] = [1, 2, 3];
-
+  @Input() transfersLoading: boolean = false;
+  @Input() transferHistory: ApiResponse<Transfer[]> | null = null;
+  @Input() accountId: string = '';
 }

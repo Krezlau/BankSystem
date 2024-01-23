@@ -1,4 +1,4 @@
-<div class="p-8">
-  <h1 class="text-2xl font-bold">Account 831203 1283091283 180923:</h1>
-  <h1 class="text-9xl font-extrabold">21.37<span class="text-xl">PLN</span></h1>
+<div *ngIf="!accountLoading && accountdata && accountdata.data" class="p-8">
+  <h1 class="text-2xl font-bold">Account {{ accountdata?.data?.accountNumber }}:</h1>
+  <h1 class="text-9xl font-extrabold">{{ accountdata?.data?.accountBalance }}<span class="text-xl">PLN</span></h1>
 </div>

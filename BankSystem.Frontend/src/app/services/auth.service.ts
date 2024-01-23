@@ -14,6 +14,7 @@ export class AuthService {
   private _authState = {
     authToken: '',
     isLoggedIn: false,
+    userId: '',
   };
   private xd: Subscription = new Subscription();
 
@@ -88,6 +89,7 @@ export class AuthService {
     this._authState = {
       authToken: '',
       isLoggedIn: false,
+      userId: '',
     };
     this._authStateSignal.set(this._authState);
     localStorage.removeItem('authState');
@@ -146,6 +148,7 @@ export class AuthService {
     this._authState = {
       authToken: resp.token,
       isLoggedIn: true,
+      userId: resp.userId,
     };
     this._authStateSignal.set(this._authState);
     localStorage.setItem('authState', JSON.stringify(this._authState));
@@ -163,11 +166,13 @@ export class AuthService {
 export interface IAuthState {
   authToken: string;
   isLoggedIn: boolean;
+  userId: string;
 }
 
 export interface IAuthResponse {
   success: boolean;
   token: string;
+  userId: string;
   message?: string;
   tryCountMessage?: string;
 }
