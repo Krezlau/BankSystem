@@ -5,7 +5,7 @@
     <p class="text-sm italic">{{transfer?.timestamp}}</p>
   </div>
   <div class="flex flex-col justify-center">
-    <h1 *ngIf="transfer?.receiverId === accountId" class="text-3xl font-bold text-green-600 align-top">{{transfer?.amount}}<span class="text-lg font-normal align-bottom" style="writing-mode: vertical-rl">PLN</span></h1>
-    <h1 *ngIf="transfer?.senderId === accountId" class="text-3xl font-bold text-red-600 align-top">-{{transfer?.amount}}<span class="text-lg font-normal align-bottom" style="writing-mode: vertical-rl">PLN</span></h1>
+    <h1 *ngIf="transfer?.receiverId === accountId" class="text-3xl font-bold text-green-600 align-top">{{transfer?.amount!.toFixed(2)}}<span class="text-lg font-normal align-bottom" style="writing-mode: vertical-rl">PLN</span></h1>
+    <h1 *ngIf="transfer?.senderId === accountId" class="text-3xl font-bold text-red-600 align-top">-{{transfer?.amount!.toFixed(2)}}<span class="text-lg font-normal align-bottom" style="writing-mode: vertical-rl">PLN</span></h1>
   </div>
 </div>

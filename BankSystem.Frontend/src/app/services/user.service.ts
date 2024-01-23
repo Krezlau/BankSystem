@@ -15,8 +15,25 @@ export class UserService {
   transfersLoading = signal(false);
   accountLoading = signal(false);
   userLoading = signal(false);
+  sendTransferLoading = signal(false);
 
   constructor(private alertService: AlertService, private http: HttpClient, private authService: AuthService) { }
+
+  sendTransfer(accountNumber: string, amount: number, recipient: string, title: string) {
+    this.sendTransferLoading.set(true);
+    return this.http.post<ApiResponse<Transfer>>('http://localhost:5077/api/transfers/send', {
+      recipientBankAccountNumber: accountNumber,
+      amount: amount,
+      title: title,
+      RecipientFullName: recipient,
+    }, {headers: {
+        Authorization: `Bearer ${this.authService.getAuthState()().authToken}`
+      }}).pipe(
+      finalize(() => this.sendTransferLoading.set(false)),
+      tap((response) => {},
+        (error) => this.alertService.show(error.error.message, 'error'))
+    )
+  }
 
   getTransfers() {
     this.transfersLoading.set(true);

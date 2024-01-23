@@ -1,4 +1,4 @@
-<div class="mx-auto h-full mt-20 max-w-7xl flex flex-row justify-center gap-8">
+<div class="mx-auto h-full pt-20 pb-20 max-w-7xl flex flex-row justify-center gap-8">
   <div class="w-3/5 ">
     <div class="bg-primary rounded shadow-xl">
       <app-account-info
@@ -9,7 +9,7 @@
         [lastName]="userSensitiveData?.data?.lastName!"
       />
       <div class="w-full flex flex-row justify-end gap-8 px-12 pb-8">
-        <button class="btn btn-secondary uppercase">Send a transfer</button>
+        <button class="btn btn-secondary uppercase" onclick="my_modal_2.showModal()">Send a transfer</button>
         <button class="btn btn-secondary uppercase" (click)="logout()">Logout</button>
       </div>
     </div>
@@ -21,9 +21,23 @@
         [userSensitiveData]="userSensitiveData"/>
     </div>
   </div>
-  <div class="w-2/5 rounded shadow-xl text-gray-600 bg-gray-200 max-h-[75vh]">
+  <div class="w-2/5 rounded shadow-xl text-gray-600 bg-gray-200">
     <h1 class="text-2xl font-bold px-4 border-b-2 border-gray-400 mx-4 py-4">Transfer history</h1>
     <app-transfer-history [transferHistory]="transferHistory" [transfersLoading]="transfersLoading()"
                           [accountId]="(accountdata)?.data?.id!"/>
   </div>
 </div>
+
+<dialog id="my_modal_2" class="modal">
+  <form class="modal-box text-black flex flex-col gap-4" (ngSubmit)="sumbitTransfer()">
+    <h1 class="text-2xl font-bold">Send a transfer</h1>
+    <input class="input input-primary" placeholder="Recipient Name" [formControl]="RecipientControl"/>
+    <input class="input input-primary" placeholder="Recipient Account Number" [formControl]="AccountNumberControl"/>
+    <input class="input input-primary" placeholder="Title" [formControl]="TitleControl"/>
+    <input class="input input-primary" type="number" placeholder="Amount" min="0" step="0.1" [formControl]="AmountControl"/>
+    <button type="submit" class="btn btn-primary">Send</button>
+  </form>
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="resetForm()">close</button>
+  </form>
+</dialog>
