@@ -16,8 +16,6 @@ export class AuthService {
     isLoggedIn: false,
     userId: '',
   };
-  private xd: Subscription = new Subscription();
-
   private _authStateSignal = signal(this._authState);
 
   isLoading = signal(false);
@@ -97,29 +95,22 @@ export class AuthService {
     this.router.navigate(['/']);
   }
 
-  // register(username: string, password: string, email: string) {
-  //   this.xd = this.sendRegisterRequest(username, password, email).subscribe();
-  // }
-  //
-  // sendRegisterRequest(username: string, password: string, email: string) {
-  //   this.isLoading.set(true);
-  //   return this.http
-  //     .post<ApiResponse<IAuthResponse>>('http://localhost:5077/api/auth/register', {
-  //       username,
-  //       password,
-  //       email,
-  //     })
-  //     .pipe(
-  //       finalize(() => {
-  //         this.isLoading.set(false);
-  //         this.xd.unsubscribe();
-  //       }),
-  //       tap(
-  //         (res) => this.handleAuthResponse(res, true),
-  //         (error) => this.handleAuthError(error),
-  //       ),
-  //     );
-  // }
+  sendRegisterRequest(email: string, firstName: string,  lastName: string, password: string, idNumber: string, phoneNumber: string) {
+    this.isLoading.set(true);
+    return this.http
+      .post<ApiResponse<IAuthResponse>>('http://localhost:5077/api/auth/register', {
+        email, firstName, lastName, password, idNumber, phoneNumber
+      })
+      .pipe(
+        finalize(() => {
+          this.isLoading.set(false);
+        }),
+        tap(
+          (res) => this.handleAuthResponse(res, true),
+          (error) => this.handleAuthError(error),
+        ),
+      );
+  }
 
   private handleAuthError(err: any) {
     const response = err.error as ApiResponse<IAuthResponse>;
@@ -133,7 +124,7 @@ export class AuthService {
   }
 
   private handleAuthResponse(res: ApiResponse<IAuthResponse>, isRegister = false) {
-    if (!res.data || !res.data.success) {
+    if (!isRegister && (!res.data || !res.data.success)) {
       console.log("xd")
       const data = res.data as IAuthResponse;
       if (data.tryCountMessage)
@@ -143,7 +134,6 @@ export class AuthService {
       this.router.navigate(["/sign-in"]);
       throw res;
     }
-    if (!res.data || !res.data.success) { return; }
 
     const resp = res.data as IAuthResponse;
     this._authState = {
@@ -155,11 +145,12 @@ export class AuthService {
     localStorage.setItem('authState', JSON.stringify(this._authState));
     const expiresAt = moment().add(1, 'hour');
     localStorage.setItem('expires_at', expiresAt.toISOString());
-    this.router.navigate(['/dashboard']);
     if (isRegister) {
       this.alertService.show('Registered successfully!', 'success');
+      this.router.navigate(['/sign-in']);
     } else {
       this.alertService.show('Logged in successfully!', 'success');
+      this.router.navigate(['/dashboard']);
     }
   }
 }
