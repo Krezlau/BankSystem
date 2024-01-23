@@ -8,7 +8,7 @@ import ApiResponse from "../../../types/ApiResponse";
 import Transfer from "../../../types/Transfer";
 import BankAccount from "../../../types/BankAccount";
 import UserSensitiveData from "../../../types/UserSensitiveData";
-import {AsyncPipe} from "@angular/common";
+import {AsyncPipe, NgIf} from "@angular/common";
 import {AuthService} from "../../../services/auth.service";
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {AlertService} from "../../../services/alert.service";
@@ -23,7 +23,8 @@ import {Router} from "@angular/router";
     UserSensitiveDataComponent,
     AsyncPipe,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './dash-board-page.component.html'
 })

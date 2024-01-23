@@ -1,3 +1,6 @@
+<div *ngIf="accountLoading" class="flex flex-col py-20 justify-center w-full h-full">
+  <span class="loading loading-spinner loading-lg mx-auto"></span>
+</div>
 <div *ngIf="!accountLoading && accountdata && accountdata.data" class="p-8">
   <h1 class="text-2xl font-bold">Account {{ accountdata?.data?.accountNumber }}:</h1>
   <h1 class="text-9xl font-extrabold">{{ accountdata?.data!.accountBalance.toFixed(2) }}<span class="text-xl">PLN</span></h1>

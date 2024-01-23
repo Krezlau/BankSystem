@@ -2,13 +2,14 @@ import {Component, Input} from '@angular/core';
 import ApiResponse from "../../../types/ApiResponse";
 import UserSensitiveData from "../../../types/UserSensitiveData";
 import BankAccount from "../../../types/BankAccount";
-import {NgClass} from "@angular/common";
+import {NgClass, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-user-sensitive-data',
   standalone: true,
   imports: [
-    NgClass
+    NgClass,
+    NgIf
   ],
   templateUrl: './user-sensitive-data.component.html'
 })

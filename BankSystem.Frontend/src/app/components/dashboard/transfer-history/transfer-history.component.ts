@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {TransferComponent} from "../transfer/transfer.component";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import ApiResponse from "../../../types/ApiResponse";
 import Transfer from "../../../types/Transfer";
 
@@ -9,7 +9,8 @@ import Transfer from "../../../types/Transfer";
   standalone: true,
   imports: [
     TransferComponent,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './transfer-history.component.html'
 })

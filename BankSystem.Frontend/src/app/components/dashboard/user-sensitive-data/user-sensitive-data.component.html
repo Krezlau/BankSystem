@@ -1,5 +1,9 @@
 <h1 class="text-2xl px-4" >Your Data</h1>
-<div class="bg-gray-200 p-4 rounded shadow-xl">
+<div *ngIf="userLoading || accountLoading" class="flex flex-row justify-center py-20">
+  <span class="loading loading-spinner loading-lg"></span>
+</div>
+<div *ngIf="!userLoading && !userLoading && accountdata && accountdata.data && userSensitiveData && userSensitiveData.data"
+     class="bg-gray-200 p-4 rounded shadow-xl">
   <h2 class="italic text-xl">Debit card</h2>
   <div class="flex flex-row justify-between px-12 py-2">
     <div>

@@ -39,7 +39,8 @@ export class ChangePasswordFormComponent implements OnInit, OnDestroy {
   confirmPasswordControl = new FormControl('', [Validators.required, Validators.minLength(12), Validators.maxLength(24)]);
 
   sub = new Subscription();
-  passwordStrength = 0;
+
+  isLoading = this.authService.isLoading;
 
   constructor(private route: ActivatedRoute, private alertService: AlertService, private router: Router, private authService: AuthService) {
   }
