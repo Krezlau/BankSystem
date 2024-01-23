@@ -11,6 +11,8 @@ public interface IUserRepository
     Task UpdateUserAsync(User user);
     
     Task UpdateUserPasswordAsync(User user, string hashedSecret, List<PasswordKey> keys);
+    
+    Task<User?> GetUserAsync(Guid userId);
 
     Task<User?> GetUserWithPasswordAsync(string email);
     
@@ -51,6 +53,13 @@ public class UserRepository : IUserRepository
         user.PasswordKeys = keys;
         _dbContext.Users.Update(user);
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<User?> GetUserAsync(Guid userId)
+    {
+        return await _dbContext.Users
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<User?> GetUserWithPasswordAsync(string email)

@@ -32,9 +32,12 @@ public class UserService : IUserService
 
     public async Task<UserSensitiveDataModel> GetMySensitiveDataAsync(Guid userId)
     {
+        var user = await _userRepository.GetUserAsync(userId);
+        if (user is null) throw new KeyNotFoundException("User not found");
+        
         var sensitiveData = await _userRepository.GetUserSensitiveDataAsync(userId);
-        if (sensitiveData is null) throw new Exception("User sensitive data not found");
+        if (sensitiveData is null) throw new KeyNotFoundException("User sensitive data not found");
 
-        return sensitiveData.ToModel();
+        return sensitiveData.ToModel(user.FirstName, user.LastName);
     }
 }
