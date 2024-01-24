@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankSystem.Data.Migrations
 {
     [DbContext(typeof(BankDbContext))]
-    [Migration("20240119152824_PartialPasswords")]
-    partial class PartialPasswords
+    [Migration("20240124134146_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,29 +25,34 @@ namespace BankSystem.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BankSystem.Data.Entities.DebitCard", b =>
+            modelBuilder.Entity("BankSystem.Data.Entities.BankAccount", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal>("AccountBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.Property<string>("CardNumber")
                         .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("nvarchar(16)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Cvv")
                         .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ExpirationDate")
                         .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -57,10 +62,16 @@ namespace BankSystem.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccountNumber")
+                        .IsUnique();
+
+                    b.HasIndex("CardNumber")
+                        .IsUnique();
+
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("DebitCards");
+                    b.ToTable("BankAccounts");
                 });
 
             modelBuilder.Entity("BankSystem.Data.Entities.Login", b =>
@@ -86,8 +97,7 @@ namespace BankSystem.Data.Migrations
 
                     b.Property<string>("IpAddress")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -120,23 +130,64 @@ namespace BankSystem.Data.Migrations
                     b.ToTable("Logins");
                 });
 
+            modelBuilder.Entity("BankSystem.Data.Entities.LoginRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Consumed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Failed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Mask")
+                        .IsRequired()
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LoginRequests");
+                });
+
             modelBuilder.Entity("BankSystem.Data.Entities.PasswordKey", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<byte[]>("IV")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<byte[]>("Key")
+                    b.Property<string>("EncryptedShare")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("Salt")
+                    b.Property<string>("IV")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -154,33 +205,27 @@ namespace BankSystem.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("AccountBalanceAfter")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
                     b.Property<Guid>("ReceiverId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReceiverName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -200,9 +245,6 @@ namespace BankSystem.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("AccountBalance")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -215,9 +257,15 @@ namespace BankSystem.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LockedUntil")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SecretHash")
                         .IsRequired()
@@ -245,13 +293,11 @@ namespace BankSystem.Data.Migrations
 
                     b.Property<string>("IdNumber")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -267,11 +313,11 @@ namespace BankSystem.Data.Migrations
                     b.ToTable("UserSensitiveData");
                 });
 
-            modelBuilder.Entity("BankSystem.Data.Entities.DebitCard", b =>
+            modelBuilder.Entity("BankSystem.Data.Entities.BankAccount", b =>
                 {
                     b.HasOne("BankSystem.Data.Entities.User", "User")
-                        .WithOne("DebitCard")
-                        .HasForeignKey("BankSystem.Data.Entities.DebitCard", "UserId")
+                        .WithOne("BankAccount")
+                        .HasForeignKey("BankSystem.Data.Entities.BankAccount", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -302,13 +348,13 @@ namespace BankSystem.Data.Migrations
 
             modelBuilder.Entity("BankSystem.Data.Entities.Transfer", b =>
                 {
-                    b.HasOne("BankSystem.Data.Entities.User", "Receiver")
+                    b.HasOne("BankSystem.Data.Entities.BankAccount", "Receiver")
                         .WithMany("TransfersReceived")
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("BankSystem.Data.Entities.User", "Sender")
+                    b.HasOne("BankSystem.Data.Entities.BankAccount", "Sender")
                         .WithMany("TransfersSent")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -330,9 +376,16 @@ namespace BankSystem.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BankSystem.Data.Entities.BankAccount", b =>
+                {
+                    b.Navigation("TransfersReceived");
+
+                    b.Navigation("TransfersSent");
+                });
+
             modelBuilder.Entity("BankSystem.Data.Entities.User", b =>
                 {
-                    b.Navigation("DebitCard")
+                    b.Navigation("BankAccount")
                         .IsRequired();
 
                     b.Navigation("Logins");
@@ -341,10 +394,6 @@ namespace BankSystem.Data.Migrations
 
                     b.Navigation("SensitiveData")
                         .IsRequired();
-
-                    b.Navigation("TransfersReceived");
-
-                    b.Navigation("TransfersSent");
                 });
 #pragma warning restore 612, 618
         }

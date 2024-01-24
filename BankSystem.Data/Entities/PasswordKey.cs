@@ -11,13 +11,13 @@ public class PasswordKey : Auditable
     public Guid Id { get; set; }
     
     [Required]
-    public byte[] Salt { get; set; } = new byte[16];
+    public string Salt { get; set; }
     
     [Required]
-    public byte[] EncryptedShare { get; set; } = new byte[32];
+    public string EncryptedShare { get; set; }
     
     [Required]
-    public byte[] IV { get; set; } = new byte[16];
+    public string IV { get; set; }
     
     [Required]
     public Guid UserId { get; set; }

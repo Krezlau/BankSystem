@@ -44,8 +44,8 @@ public class AuthService : IAuthService
         var loginRequest = await _loginRequestRepository.GetValidLoginRequestForUserAsync(model.Email);
         if (loginRequest is not null) return new LoginCheckResponseModel(loginRequest.Mask, loginRequest.Id);
         
-        //var mask = GenerateMask();
-        var mask = "010101010100000000000000"; // for testing
+        var mask = GenerateMask();
+        // var mask = "010101010100000000000000"; // for testing
         loginRequest = await _loginRequestRepository.CreateLoginRequestAsync(mask, model.Email);
         
         return new LoginCheckResponseModel(mask, loginRequest.Id);

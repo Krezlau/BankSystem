@@ -63,7 +63,7 @@ public class LoginRequestRepository : ILoginRequestRepository
             Mask = mask,
             Email = email,
             Consumed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10)
+            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
         };
         await _dbContext.LoginRequests.AddAsync(loginRequest);
         await _dbContext.SaveChangesAsync();

@@ -1,4 +1,5 @@
-﻿using BankSystem.Data.Models;
+﻿using BankSystem.Api.Middleware;
+using BankSystem.Data.Models;
 using BankSystem.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ public class UsersController : BankApiController
     }
 
     [HttpGet("myaccount")]
+    [LogRequests]
     public async Task<IActionResult> GetMyAccount()
     {
         var userId = GetUserId(Request);
@@ -25,6 +27,7 @@ public class UsersController : BankApiController
     }
     
     [HttpGet("mySensitiveData")]
+    [LogRequests]
     public async Task<IActionResult> GetMySensitiveData()
     {
         var userId = GetUserId(Request);

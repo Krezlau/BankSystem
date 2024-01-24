@@ -32,7 +32,7 @@ public static class UserMappingService
         var expirationDate = DateTime.UtcNow.AddYears(5).ToString("MM/yy");
         return new BankAccount
         {
-            CardNumber = string.Empty,
+            CardNumber = "1234",
             Cvv = cvv,
             ExpirationDate = expirationDate,
             AccountBalance = 100

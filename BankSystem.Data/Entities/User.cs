@@ -23,6 +23,7 @@ public class User : Auditable
     public bool IsLocked { get; set; } = false;
     
     [Required]
+    // [Column(TypeName = "timestamp without time zone")]
     public DateTime LockedUntil { get; set; } = DateTime.UtcNow;
     
     [Required]
@@ -35,7 +36,7 @@ public class User : Auditable
     
     public virtual UserSensitiveData SensitiveData { get; set; }
     
-    public virtual List<Login> Logins { get; set; }
+    public virtual List<Log> Logins { get; set; }
     
     public virtual BankAccount BankAccount { get; set; }
 }

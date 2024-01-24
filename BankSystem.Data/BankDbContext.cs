@@ -1,25 +1,37 @@
-﻿using BankSystem.Data.Entities;
+﻿using System.Text;
+using BankSystem.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.DataEncryption;
+using Microsoft.EntityFrameworkCore.DataEncryption.Providers;
+using Microsoft.Extensions.Configuration;
 
 namespace BankSystem.Data;
 
 public class BankDbContext : DbContext
 {
-    public BankDbContext(DbContextOptions<BankDbContext> options) : base(options)
+    private readonly byte[] _encryptionKey;
+    private readonly byte[] _encryptionIV;
+    private readonly IEncryptionProvider _encryptionProvider;
+    
+    public BankDbContext(DbContextOptions<BankDbContext> options, IConfiguration config) : base(options)
     {
+        _encryptionKey = Encoding.UTF8.GetBytes(config["EncryptionKey"]);
+        _encryptionIV = Encoding.UTF8.GetBytes(config["EncryptionIV"]);
+        _encryptionProvider = new AesProvider(_encryptionKey, _encryptionIV);
     }
 
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Transfer> Transfers { get; set; } = null!;
     public DbSet<UserSensitiveData> UserSensitiveData { get; set; } = null!;
-    public DbSet<Login> Logins { get; set; } = null!;
+    public DbSet<Log> Logins { get; set; } = null!;
     public DbSet<BankAccount> BankAccounts { get; set; } = null!;
     public DbSet<PasswordKey> PasswordKeys { get; set; } = null!;
     public DbSet<LoginRequest> LoginRequests { get; set; } = null!;
-    public DbSet<Deposit> Deposits { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseEncryption(_encryptionProvider);
+        
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasIndex(e => e.Email).IsUnique();
@@ -37,8 +49,8 @@ public class BankDbContext : DbContext
             entity.HasIndex(x => x.CardNumber).IsUnique();
         });
         
-        modelBuilder.Entity<BankAccount>()
-            .ToTable(b => b.HasCheckConstraint("CK_BankAccounts_Balance", "[AccountBalance] >= 0"));
+        // modelBuilder.Entity<BankAccount>()
+        //     .ToTable(b => b.HasCheckConstraint("CK_BankAccounts_Balance", "[AccountBalance] >= 0"));
         
         base.OnModelCreating(modelBuilder);
     }

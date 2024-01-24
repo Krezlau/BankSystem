@@ -18,19 +18,21 @@ public class AuthController : BankApiController
     }
     
     [HttpPost("login-check")]
+    [LogRequests]
     public async Task<IActionResult> LoginCheck([FromBody] LoginCheckRequestModel model)
     {
         return Ok(ApiResponseHelper.Success(await _authService.LoginCheckAsync(model)));
     }
 
     [HttpPost("login")]
-    [LogSignInAttempts]
+    [LogRequests]
     public async Task<IActionResult> Login([FromBody] LoginRequestModel model)
     {
         return Ok(ApiResponseHelper.Success(await _authService.LoginAsync(model)));
     }
     
     [HttpPost("register")]
+    [LogRequests]
     public async Task<IActionResult> Register([FromBody] RegisterRequestModel model)
     {
         return Ok(ApiResponseHelper.Success(await _authService.RegisterAsync(model)));
@@ -38,6 +40,7 @@ public class AuthController : BankApiController
     
     [HttpPost("change-password")]
     [Authorize]
+    [LogRequests]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel model)
     {
         var userId = GetUserId(Request);

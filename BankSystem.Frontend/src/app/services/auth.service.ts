@@ -51,7 +51,7 @@ export class AuthService {
 
   loginCheck(email: string) {
     this.isLoading.set(true);
-    return this.http.post<ApiResponse<LoginCheckResponse>>("http://localhost:5077/api/auth/login-check", {email: email}).pipe(
+    return this.http.post<ApiResponse<LoginCheckResponse>>("https://localhost:5001/api/auth/login-check", {email: email}).pipe(
       finalize(() => {
         this.isLoading.set(false);
       }),
@@ -70,7 +70,7 @@ export class AuthService {
   sendLoginRequest(email: string, key: string, passwordCharacters: string) {
     this.isLoading.set(true);
     return this.http
-      .post<ApiResponse<IAuthResponse>>('http://localhost:5077/api/auth/login', {
+      .post<ApiResponse<IAuthResponse>>('https://localhost:5001/api/auth/login', {
         email, key, passwordCharacters
       })
       .pipe(
@@ -87,7 +87,7 @@ export class AuthService {
   changePassword(key: string, passwordCharacters: string, newPassword: string) {
     this.isLoading.set(true);
     return this.http
-      .post<ApiResponse<IAuthResponse>>('http://localhost:5077/api/auth/change-password', {
+      .post<ApiResponse<IAuthResponse>>('https://localhost:5001/api/auth/change-password', {
         key, passwordCharacters, newPassword
       }, {headers: {Authorization: `Bearer ${this.getAuthState()().authToken}`}})
       .pipe(
@@ -127,7 +127,7 @@ export class AuthService {
   sendRegisterRequest(email: string, firstName: string,  lastName: string, password: string, idNumber: string, phoneNumber: string) {
     this.isLoading.set(true);
     return this.http
-      .post<ApiResponse<IAuthResponse>>('http://localhost:5077/api/auth/register', {
+      .post<ApiResponse<IAuthResponse>>('https://localhost:5001/api/auth/register', {
         email, firstName, lastName, password, idNumber, phoneNumber
       })
       .pipe(

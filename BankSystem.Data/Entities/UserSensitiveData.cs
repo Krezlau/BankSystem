@@ -16,12 +16,10 @@ public class UserSensitiveData : Auditable
     public virtual User? User { get; set; }
     
     [Required]
-    [RegularExpression(@"^[A-Z]{3}\s\d{6}$")]
-    [MaxLength(10)]
+    [Encrypted]
     public string IdNumber { get; set; } = string.Empty;
     
     [Required]
-    [Phone]
-    [MaxLength(15)]
+    [Encrypted]
     public string PhoneNumber { get; set; } = string.Empty;
 }

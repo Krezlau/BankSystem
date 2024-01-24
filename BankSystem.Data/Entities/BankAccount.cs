@@ -27,20 +27,18 @@ public class BankAccount : Auditable
     public decimal AccountBalance { get; set; }
     
     [Required]
-    [MaxLength(16)]
+    [Encrypted]
     public string CardNumber { get; set; } = string.Empty;
     
     [Required]
-    [MaxLength(3)]
+    [Encrypted]
     public string Cvv { get; set; } = string.Empty;
     
     [Required]
-    [MaxLength(6)]
+    [Encrypted]
     public string ExpirationDate { get; set; } = string.Empty;
 
     public virtual List<Transfer> TransfersSent { get; set; } = new();
 
     public virtual List<Transfer> TransfersReceived { get; set; } = new();
-    
-    public virtual List<Deposit> Deposits { get; set; } = new();
 }

@@ -66,9 +66,8 @@ public class UserRepository : IUserRepository
     {
         return await _dbContext.Users
             .Where(x => x.Email == email)
-            .Include(x => x.PasswordKeys)
+            .Include(x => x.PasswordKeys.OrderBy(x => x.CreatedAt))
             .FirstOrDefaultAsync();
-
     }
 
     public async Task<User?> GetUserWithPasswordAsync(Guid userId)

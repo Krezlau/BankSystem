@@ -29,9 +29,9 @@ public static class PasswordService
         {
             passwordKeys.Add(new PasswordKey()
             {
-                IV = keys[i].iv,
-                EncryptedShare = encrypted[i],
-                Salt = keys[i].salt,
+                IV = Convert.ToBase64String(keys[i].iv),
+                EncryptedShare = Convert.ToBase64String(encrypted[i]),
+                Salt = Convert.ToBase64String(keys[i].salt),
             });
         }
 
@@ -96,16 +96,16 @@ public static class PasswordService
         shares = new List<string>();
         foreach (var (pos, c) in passwordChars)
         {
-            var key = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(c.ToString()), keys[pos].Salt, 100_000, HashAlgorithmName.SHA256, 32);
+            var key = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(c.ToString()), Convert.FromBase64String(keys[pos].Salt), 100_000, HashAlgorithmName.SHA256, 32);
             using var aes = Aes.Create();
-            aes.IV = keys[pos].IV;
+            aes.IV = Convert.FromBase64String(keys[pos].IV);
             aes.Mode = CipherMode.CBC;
             aes.BlockSize = 128;
             aes.Key = key;
             
             try
             {
-                var y = aes.DecryptCbc(keys[pos].EncryptedShare, keys[pos].IV);
+                var y = aes.DecryptCbc(Convert.FromBase64String(keys[pos].EncryptedShare), Convert.FromBase64String(keys[pos].IV));
                 shares.Add(MakeShare(pos + 1, y));
             }
             catch (Exception e)

@@ -21,7 +21,7 @@ export class UserService {
 
   sendTransfer(accountNumber: string, amount: number, recipient: string, title: string) {
     this.sendTransferLoading.set(true);
-    return this.http.post<ApiResponse<Transfer>>('http://localhost:5077/api/transfers/send', {
+    return this.http.post<ApiResponse<Transfer>>('https://localhost:5001/api/transfers/send', {
       recipientBankAccountNumber: accountNumber,
       amount: amount,
       title: title,
@@ -40,7 +40,7 @@ export class UserService {
 
   getTransfers() {
     this.transfersLoading.set(true);
-    return this.http.get<ApiResponse<Transfer[]>>('http://localhost:5077/api/transfers/history', {headers: {
+    return this.http.get<ApiResponse<Transfer[]>>('https://localhost:5001/api/transfers/history', {headers: {
         Authorization: `Bearer ${this.authService.getAuthState()().authToken}`
       }}).pipe(
       finalize(() => this.transfersLoading.set(false)),
@@ -54,7 +54,7 @@ export class UserService {
 
   getAccount() {
     this.accountLoading.set(true);
-    return this.http.get<ApiResponse<BankAccount>>('http://localhost:5077/api/users/myaccount', {headers: {
+    return this.http.get<ApiResponse<BankAccount>>('https://localhost:5001/api/users/myaccount', {headers: {
         Authorization: `Bearer ${this.authService.getAuthState()().authToken}`
       }}).pipe(
       finalize(() => this.accountLoading.set(false)),
@@ -68,7 +68,7 @@ export class UserService {
 
   getSensitiveData() {
     this.userLoading.set(true);
-    return this.http.get<ApiResponse<UserSensitiveData>>('http://localhost:5077/api/users/mysensitivedata', {headers: {
+    return this.http.get<ApiResponse<UserSensitiveData>>('https://localhost:5001/api/users/mysensitivedata', {headers: {
         Authorization: `Bearer ${this.authService.getAuthState()().authToken}`
       }}).pipe(
       finalize(() => this.userLoading.set(false)),

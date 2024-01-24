@@ -1,5 +1,4 @@
-﻿using System.Text;
-using BankSystem.Data;
+﻿using BankSystem.Data;
 using BankSystem.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +9,6 @@ public interface IBankAccountRepository
     Task<(BankAccount? recipient, BankAccount? sender)> GetBankAccountsAsync(string recipientBankAccountNumber, Guid senderId);
     
     Task<BankAccount?> GetBankAccountAsync(Guid userId);
-
-    Task GiveUserOneHundredPLNAsync(BankAccount bankAccount);
     
     Task AssignCardNumberAsync(BankAccount bankAccount);
 }
@@ -29,13 +26,11 @@ public class BankAccountRepository : IBankAccountRepository
     public async Task<(BankAccount? recipient, BankAccount? sender)> GetBankAccountsAsync(string recipientBankAccountNumber, Guid senderId)
     {
         var recipient = await _dbContext.BankAccounts
-            .Include(x => x.Deposits)
             .Include(x => x.TransfersReceived)
             .Include(x => x.TransfersSent)
             .FirstOrDefaultAsync(x => x.AccountNumber == recipientBankAccountNumber);
 
         var sender = await _dbContext.BankAccounts
-            .Include(x => x.Deposits)
             .Include(x => x.TransfersReceived)
             .Include(x => x.TransfersSent)
             .FirstOrDefaultAsync(x => x.UserId == senderId);
@@ -46,18 +41,6 @@ public class BankAccountRepository : IBankAccountRepository
     public async Task<BankAccount?> GetBankAccountAsync(Guid userId)
     {
         return await _dbContext.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userId);
-    }
-
-    public async Task GiveUserOneHundredPLNAsync(BankAccount bankAccount)
-    {
-        var deposit = new Deposit
-        {
-            Amount = 100,
-            BankAccountId = bankAccount.Id
-        };
-        _dbContext.Deposits.Add(deposit);
-        await _dbContext.SaveChangesAsync();
-        
     }
 
     public async Task AssignCardNumberAsync(BankAccount bankAccount)

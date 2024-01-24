@@ -10,7 +10,10 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<BankDbContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            // options.UseNpgsql(connectionString);
+            // options.UseSqlServer(
+                // "Server=tcp:ochronadb.database.windows.net,1433;Initial Catalog=ochrona;Persist Security Info=False;User ID=ochrona;Password=Cebula123!@#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+                options.UseSqlServer("Server=mssql1;Database=BankDB;User Id=SA;Password=sapassword123!@#;TrustServerCertificate=True;");
         });
 
         return services;

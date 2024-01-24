@@ -1,9 +1,12 @@
+using System.Net;
 using System.Text;
+using BankSystem.Api;
 using BankSystem.Api.Middleware;
 using BankSystem.Data;
 using BankSystem.Repositories;
 using BankSystem.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -15,7 +18,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.ConfigureServices();
 builder.Services.ConfigureRepositories();
-builder.Services.AddBankDbContext(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddBankDbContext("Server=postgres; Database=bank; Port=5432; User Id=postgres; Password=postgres");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -32,6 +35,17 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Key").Value))
     };
+});
+
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
+    options.HttpsPort = 5001;
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 builder.Services.AddSwaggerGen(c =>
@@ -68,14 +82,16 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseForwardedHeaders();
+app.UseAuthorization();
+app.UseAuthentication();
 // for now
 app.UseCors(options =>
 {
@@ -85,7 +101,9 @@ app.UseCors(options =>
 });
 
 app.MapControllers();
-app.UseMiddleware<SignInAttemptLoggerMiddleware>();
+app.UseMiddleware<RequestLogger>();
 app.UseMiddleware<ExceptionHandler>();
 
+Thread.Sleep(5_000);
+DatabaseManagementService.MigrationInitialisation(app);
 app.Run();

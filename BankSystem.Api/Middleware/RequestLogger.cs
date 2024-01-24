@@ -3,62 +3,60 @@ using System.Text.Json;
 using BankSystem.Data;
 using BankSystem.Data.Entities;
 using BankSystem.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using BankSystem.Services.Auth;
 
 namespace BankSystem.Api.Middleware;
 
-public class SignInAttemptLoggerMiddleware
+public class RequestLogger
 {
     private readonly RequestDelegate _next;
 
-    public SignInAttemptLoggerMiddleware(RequestDelegate next)
+    public RequestLogger(RequestDelegate next)
     {
         _next = next;
     }
     
     public async Task InvokeAsync(HttpContext context, BankDbContext dbContext)
     {
-        var logSignInAttemptsAttribute = context.GetEndpoint()?.Metadata.GetMetadata<LogSignInAttemptsAttribute>();
+        var logSignInAttemptsAttribute = context.GetEndpoint()?.Metadata.GetMetadata<LogRequestsAttribute>();
         if (logSignInAttemptsAttribute is null)
         {
             await _next(context);
             return;
         }
-        var email = await ReadEmailFromBodyAsync(context.Request); 
-        if (email is null)
-        {
-            await _next(context);
-            return;
-        }
-        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
-        if (user is null)
-        {
-            await _next(context);
-            return;
-        }
         
-        var ipAddress = context.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? context.Connection.RemoteIpAddress?.ToString();
+        var ipAddress = context.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? string.Empty;
         var userAgent = context.Request.Headers["User-Agent"].ToString();
-        var requestTime = DateTime.UtcNow;
-        
-        var signInAttempt = new Login() 
+        var authHeader = context.Request.Headers["Authorization"];
+        Guid? userId = null;
+        if (authHeader.Count != 0)
         {
-            UserId = user.Id,
+            var jwt = authHeader.ToString().Replace("Bearer ", "");
+            userId = JwtService.GetUserIdFromJwtToken(jwt);
+        }
+        
+        var url = context.Request.Path.Value;
+        
+        var request = new Log() 
+        {
+            UserId = userId,
             IpAddress = ipAddress,
             UserAgent = userAgent,
-            Timestamp = requestTime,
             Successful = false,
+            Url = url ?? string.Empty
         };
         
-        dbContext.Logins.Add(signInAttempt);
+        dbContext.Logins.Add(request);
         await dbContext.SaveChangesAsync();
         
         await _next(context);
         
-        signInAttempt.Successful = true;
-        dbContext.Update(signInAttempt);
-        await dbContext.SaveChangesAsync();
+        if (context.Response.StatusCode < 400)
+        {
+            request.Successful = true;
+            dbContext.Update(request);
+            await dbContext.SaveChangesAsync();
+        }
     }
     
     private async Task<string?> ReadEmailFromBodyAsync(HttpRequest request)
