@@ -23,7 +23,6 @@ public class User : Auditable
     public bool IsLocked { get; set; } = false;
     
     [Required]
-    // [Column(TypeName = "timestamp without time zone")]
     public DateTime LockedUntil { get; set; } = DateTime.UtcNow;
     
     [Required]

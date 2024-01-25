@@ -27,7 +27,7 @@ public class TransferService : ITransferService
     {
         var (recipient, sender) = await _bankAccountRepository.GetBankAccountsAsync(model.RecipientBankAccountNumber, userId);
 
-        if (recipient is null || sender is null)
+        if (recipient is null || sender is null || sender.Id == recipient.Id)
         {
             throw new ArgumentException("Invalid bank account number.");
         }
@@ -48,6 +48,6 @@ public class TransferService : ITransferService
     {
         var transfers = await _transferRepository.GetHistoryAsync(userId);
 
-        return transfers.Select(x => x.ToModel()).ToList();
+        return transfers.Select(x => TransferDefaultModel.FromEntity(x).ToModel()).ToList();
     }
 }

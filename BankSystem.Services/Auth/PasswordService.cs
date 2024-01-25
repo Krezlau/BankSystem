@@ -79,7 +79,7 @@ public static class PasswordService
 
             try
             {
-                var ct = aes.EncryptCbc(shares[i].Y.Value.ToByteArray(), keys[i].iv);
+                var ct = aes.EncryptCbc(shares[i].Y.Value.ToByteArray(), keys[i].iv, PaddingMode.PKCS7);
                 encrypted.Add(ct);
             }
             catch (Exception e)
@@ -105,7 +105,7 @@ public static class PasswordService
             
             try
             {
-                var y = aes.DecryptCbc(Convert.FromBase64String(keys[pos].EncryptedShare), Convert.FromBase64String(keys[pos].IV));
+                var y = aes.DecryptCbc(Convert.FromBase64String(keys[pos].EncryptedShare), Convert.FromBase64String(keys[pos].IV), PaddingMode.PKCS7);
                 shares.Add(MakeShare(pos + 1, y));
             }
             catch (Exception e)

@@ -37,20 +37,14 @@ public class BankDbContext : DbContext
             entity.HasIndex(e => e.Email).IsUnique();
         });
 
-        modelBuilder.Entity<Transfer>(entity =>
-        {
-            entity.HasOne(x => x.Sender).WithMany(x => x.TransfersSent);
-            entity.HasOne(x => x.Receiver).WithMany(x => x.TransfersReceived);
-        });
-
         modelBuilder.Entity<BankAccount>(entity =>
         {
             entity.HasIndex(x => x.AccountNumber).IsUnique();
             entity.HasIndex(x => x.CardNumber).IsUnique();
         });
         
-        // modelBuilder.Entity<BankAccount>()
-        //     .ToTable(b => b.HasCheckConstraint("CK_BankAccounts_Balance", "[AccountBalance] >= 0"));
+         modelBuilder.Entity<BankAccount>()
+             .ToTable(b => b.HasCheckConstraint("CK_BankAccounts_Balance", "[AccountBalance] >= 0"));
         
         base.OnModelCreating(modelBuilder);
     }

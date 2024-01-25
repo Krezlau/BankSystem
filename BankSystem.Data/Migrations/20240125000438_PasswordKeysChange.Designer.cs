@@ -4,6 +4,7 @@ using BankSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankSystem.Data.Migrations
 {
     [DbContext(typeof(BankDbContext))]
-    partial class BankDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240125000438_PasswordKeysChange")]
+    partial class PasswordKeysChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,10 +71,7 @@ namespace BankSystem.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("BankAccounts", t =>
-                        {
-                            t.HasCheckConstraint("CK_BankAccounts_Balance", "[AccountBalance] >= 0");
-                        });
+                    b.ToTable("BankAccounts");
                 });
 
             modelBuilder.Entity("BankSystem.Data.Entities.Log", b =>
@@ -183,27 +183,19 @@ namespace BankSystem.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid?>("BankAccountId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("BankAccountId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("ReceiverId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ReceiverName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -215,9 +207,9 @@ namespace BankSystem.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BankAccountId");
+                    b.HasIndex("ReceiverId");
 
-                    b.HasIndex("BankAccountId1");
+                    b.HasIndex("SenderId");
 
                     b.ToTable("Transfers");
                 });
@@ -327,13 +319,21 @@ namespace BankSystem.Data.Migrations
 
             modelBuilder.Entity("BankSystem.Data.Entities.Transfer", b =>
                 {
-                    b.HasOne("BankSystem.Data.Entities.BankAccount", null)
+                    b.HasOne("BankSystem.Data.Entities.BankAccount", "Receiver")
                         .WithMany("TransfersReceived")
-                        .HasForeignKey("BankAccountId");
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
-                    b.HasOne("BankSystem.Data.Entities.BankAccount", null)
+                    b.HasOne("BankSystem.Data.Entities.BankAccount", "Sender")
                         .WithMany("TransfersSent")
-                        .HasForeignKey("BankAccountId1");
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("BankSystem.Data.Entities.UserSensitiveData", b =>

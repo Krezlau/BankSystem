@@ -1,5 +1,6 @@
 ﻿using BankSystem.Data;
 using BankSystem.Data.Entities;
+using BankSystem.Data.Models.Transfers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem.Repositories.Transfers;
@@ -8,7 +9,7 @@ public interface ITransferRepository
 {
     Task<List<Transfer>> GetHistoryAsync(Guid userId);
     
-    Task SendAsync(Guid userId, Transfer entity);
+    Task SendAsync(Guid userId, TransferDefaultModel entity);
 }
 
 public class TransferRepository : ITransferRepository
@@ -22,17 +23,24 @@ public class TransferRepository : ITransferRepository
 
     public async Task<List<Transfer>> GetHistoryAsync(Guid userId)
     {
+        // return await _dbContext.Transfers
+        //     .Where(x => x.Sender.UserId == userId || x.Receiver.UserId == userId)
+        //     .OrderByDescending(x => x.CreatedAt)
+        //     .ToListAsync();
+        
+        var accountNumber = await _dbContext.BankAccounts.Where(x => x.UserId == userId).Select(x => x.Id).FirstOrDefaultAsync();
+        
         return await _dbContext.Transfers
-            .Where(x => x.Sender.UserId == userId || x.Receiver.UserId == userId)
+            .Where(x => x.SenderId == accountNumber.ToString() || x.ReceiverId == accountNumber.ToString())
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
     }
 
-    public async Task SendAsync(Guid userId, Transfer entity)
+    public async Task SendAsync(Guid userId, TransferDefaultModel entity)
     {
         await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         
-        _dbContext.Transfers.Add(entity);
+        _dbContext.Transfers.Add(TransferDefaultModel.ToEntity(entity));
         await _dbContext.SaveChangesAsync();
         
         // Update sender's account balance

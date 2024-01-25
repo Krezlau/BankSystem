@@ -11,22 +11,17 @@ public class Transfer : Auditable
     public Guid Id { get; set; }
     
     [Required]
-    public Guid SenderId { get; set; }
-    
-    [ForeignKey(nameof(SenderId))]
-    [DeleteBehavior(DeleteBehavior.NoAction)]
-    public virtual BankAccount? Sender { get; set; }
+    [Encrypted]
+    public string SenderId { get; set; }
     
     [Required]
     [MaxLength(50)]
+    [Encrypted]
     public string ReceiverName { get; set; } = string.Empty;
     
     [Required]
-    public Guid ReceiverId { get; set; }
-    
-    [ForeignKey(nameof(ReceiverId))]
-    [DeleteBehavior(DeleteBehavior.NoAction)]
-    public virtual BankAccount? Receiver { get; set; }
+    [Encrypted]
+    public string ReceiverId { get; set; }
     
     [Required]
     public decimal Amount { get; set; }

@@ -43,8 +43,10 @@ public class AuthService : IAuthService
         // check if there's a valid login request
         var loginRequest = await _loginRequestRepository.GetValidLoginRequestForUserAsync(model.Email);
         if (loginRequest is not null) return new LoginCheckResponseModel(loginRequest.Mask, loginRequest.Id);
+
+        var user = await _userRepository.GetUserWithPasswordAsync(model.Email);
         
-        var mask = GenerateMask();
+        var mask = GenerateMask(user is null ? 24 : user.PasswordKeys.Count);
         // var mask = "010101010100000000000000"; // for testing
         loginRequest = await _loginRequestRepository.CreateLoginRequestAsync(mask, model.Email);
         
@@ -55,14 +57,21 @@ public class AuthService : IAuthService
     {
         var loginRequest = await ValidateLoginRequestModelAndThrowAsync(model.PasswordCharacters, model.Email, model.Key);
         
-        var user = await _userRepository.GetUserWithPasswordAsync(model.Email);
-        if (user is null)
-            return await FailRequestAsync(user, model.Email, loginRequest);
+        Thread.Sleep(3000); // add delay to prevent timing attacks
         
-        if (user.IsLocked && user.LockedUntil > DateTime.UtcNow)
+        var user = await _userRepository.GetUserWithPasswordAsync(model.Email);
+        var userExists = true;
+        if (user is null)
+        {
+            userExists = false;
+            user = await _userRepository.GetRandomUserAsync();
+            if (user is null) return AuthResponseHelper.Failed(0);
+        }
+        
+        if (user.IsLocked && user.LockedUntil > DateTime.UtcNow && userExists)
             return AuthResponseHelper.Locked();
         
-        if (user.IsLocked) // unlock user if locked time has passed
+        if (user.IsLocked && userExists) // unlock user if locked time has passed
         {
             user.IsLocked = false;
             user.LockedUntil = DateTime.UtcNow;
@@ -70,8 +79,8 @@ public class AuthService : IAuthService
         }
         
         var passwordChars = ParseMaskAndCharacters(loginRequest.Mask, model.PasswordCharacters);
-        if (!PasswordService.VerifyPassword(passwordChars, user.SecretHash, user.PasswordKeys))
-            return await FailRequestAsync(user, model.Email, loginRequest);
+        if (!PasswordService.VerifyPassword(passwordChars, user.SecretHash, user.PasswordKeys) || !userExists)
+            return await FailRequestAsync(userExists ? user : null, model.Email, loginRequest);
             
         var token = _jwtService.GenerateJwtToken(user.Email, user.Id);
         return AuthResponseHelper.Success(token, user.Id, user.Email);
@@ -126,13 +135,13 @@ public class AuthService : IAuthService
         return loginRequest;
     }
 
-    private static string GenerateMask()
+    private static string GenerateMask(int maxlen)
     {
         var random = new Random();
         HashSet<int> positions = new();
         while (positions.Count < 5)
         {
-            positions.Add(random.Next(0, 24));
+            positions.Add(random.Next(0, maxlen));
         }
         
         

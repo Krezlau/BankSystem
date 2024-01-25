@@ -2,6 +2,7 @@
 using BankSystem.Data.Models;
 using BankSystem.Data.Models.Transfers;
 using BankSystem.Services.Transfers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ public class TransfersController : BankApiController
     }
     
     [HttpPost("send")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [LogRequests]
     public async Task<IActionResult> Create([FromBody] TransferSendModel model)
     {
@@ -28,6 +30,7 @@ public class TransfersController : BankApiController
     }
     
     [HttpGet("history")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [LogRequests]
     public async Task<IActionResult> GetHistory()
     {

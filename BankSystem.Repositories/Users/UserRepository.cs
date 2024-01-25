@@ -19,6 +19,8 @@ public interface IUserRepository
     Task<User?> GetUserWithPasswordAsync(Guid userId);
     
     Task<UserSensitiveData?> GetUserSensitiveDataAsync(Guid userId);
+    
+    Task<User?> GetRandomUserAsync();
 }
 
 public class UserRepository : IUserRepository
@@ -66,7 +68,7 @@ public class UserRepository : IUserRepository
     {
         return await _dbContext.Users
             .Where(x => x.Email == email)
-            .Include(x => x.PasswordKeys.OrderBy(x => x.CreatedAt))
+            .Include(x => x.PasswordKeys)
             .FirstOrDefaultAsync();
     }
 
@@ -82,6 +84,14 @@ public class UserRepository : IUserRepository
     {
         return await _dbContext.UserSensitiveData
             .Where(x => x.UserId == userId)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<User?> GetRandomUserAsync()
+    {
+        return await _dbContext.Users
+            .OrderBy(x => Guid.NewGuid())
+            .Include(x => x.PasswordKeys)
             .FirstOrDefaultAsync();
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BankSystem.Data.Entities;
 
-public class PasswordKey : Auditable
+public class PasswordKey 
 {
     [Key]
     public Guid Id { get; set; }

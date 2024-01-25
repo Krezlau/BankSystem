@@ -5,9 +5,9 @@ namespace BankSystem.Data.Mapping;
 
 public static class TransferMappingService
 {
-    public static Transfer ToEntity(this TransferSendModel model, Guid senderId, Guid receiverId)
+    public static TransferDefaultModel ToEntity(this TransferSendModel model, Guid senderId, Guid receiverId)
     {
-        return new Transfer
+        return new TransferDefaultModel
         {
             Amount = model.Amount,
             Title = model.Title,
@@ -17,7 +17,7 @@ public static class TransferMappingService
         };
     }
     
-    public static TransferModel ToModel(this Transfer entity)
+    public static TransferModel ToModel(this TransferDefaultModel entity)
     {
         return new TransferModel
         {

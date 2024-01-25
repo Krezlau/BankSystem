@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.ConfigureServices();
 builder.Services.ConfigureRepositories();
-builder.Services.AddBankDbContext("Server=postgres; Database=bank; Port=5432; User Id=postgres; Password=postgres");
+builder.Services.AddBankDbContext("");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -29,11 +29,14 @@ builder.Services.AddAuthentication(options =>
     options.SaveToken = true;
     options.TokenValidationParameters = new()
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
+        ValidateIssuer = false, // for dev 
+        ValidateAudience = false, // for dev
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Key").Value))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Key").Value)),
+        ClockSkew = TimeSpan.Zero,
+        ValidIssuer = builder.Configuration.GetSection("Issuer").Value,
+        ValidAudience = builder.Configuration.GetSection("Audience").Value
     };
 });
 
@@ -82,22 +85,21 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
 app.UseForwardedHeaders();
-app.UseAuthorization();
-app.UseAuthentication();
-// for now
 app.UseCors(options =>
 {
-    options.AllowAnyOrigin();
-    options.AllowAnyMethod();
-    options.AllowAnyHeader();
+    options.WithOrigins("http://localhost", "https://localhost")
+        .AllowAnyHeader()
+        .AllowCredentials()
+        .AllowAnyMethod();
 });
 
 app.MapControllers();

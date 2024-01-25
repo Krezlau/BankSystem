@@ -1,6 +1,7 @@
 ﻿using BankSystem.Api.Middleware;
 using BankSystem.Data.Models;
 using BankSystem.Services.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,7 +40,7 @@ public class AuthController : BankApiController
     }
     
     [HttpPost("change-password")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [LogRequests]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestModel model)
     {
